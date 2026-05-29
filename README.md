@@ -118,7 +118,7 @@ python monitor.py --watch        # live TVL dashboard
 | Technical Quality | 25 | Solidity 0.8.30, accumulator-style rewards, packed storage, viaIR. 11/11 tests. Full TS + Python + Node tooling. |
 | Product & UX | 20 | Distraction-free editor, live tip/stake panels, real-time stream gauge. RainbowKit polished wallet UX. |
 | Innovation | 15 | "Creator DeFi" — articles as composable yield-bearing assets. Combination of ERC-4626-style vault + streaming + creator economy. |
-| Builder Commitment | 10 | Continuation of [Inkrun](https://inkrun.vercel.app), proven product idea, full multi-component delivery. |
+| Builder Commitment | 10 | Continuation of [Inkfi](https://inkfi.vercel.app), proven product idea, full multi-component delivery. |
 
 ## License
 
