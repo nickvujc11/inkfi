@@ -1,0 +1,16 @@
+{
+  "name": "@inkfi/cli",
+  "version": "0.1.0",
+  "description": "Power-user CLI for InkFi on OPN Chain. Tip, stake, claim, and stream from your terminal.",
+  "bin": { "inkfi": "./bin/inkfi.mjs" },
+  "type": "module",
+  "scripts": {
+    "start": "node ./bin/inkfi.mjs"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "viem": "^2.21.30",
+    "dotenv": "^16.4.5",
+    "kleur": "^4.1.5"
+  }
+}

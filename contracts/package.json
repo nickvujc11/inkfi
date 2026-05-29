@@ -1,0 +1,24 @@
+{
+  "name": "inkfi-contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "InkFi smart contracts — ArticleNFT, ArticleVault, InkStream, Tipping. Deployed on OPN Chain.",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:gas": "REPORT_GAS=true hardhat test",
+    "coverage": "hardhat coverage",
+    "node": "hardhat node",
+    "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
+    "deploy:testnet": "hardhat run scripts/deploy.ts --network opnTestnet",
+    "verify": "hardhat run scripts/verify.ts --network opnTestnet",
+    "clean": "hardhat clean"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@openzeppelin/contracts": "^5.0.2",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.22.10",
+    "typescript": "^5.4.5"
+  }
+}
