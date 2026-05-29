@@ -1,0 +1,13 @@
+{
+  "network": "opnTestnet",
+  "chainId": 984,
+  "deployer": "0xCb25a4532bAcF3DFcD7153f4624E501Cb393A3e2",
+  "contracts": {
+    "WOPN": "0x31cD4d43F164B9F734Cea137c3CcCD538fC184DC",
+    "ArticleNFT": "0xdCFB5705D76cbcf425A6884247a5e9AcA6D068dF",
+    "ArticleVaultPool": "0x077eD7E64ea1Cb8F56aCEc24D5b2cEE960B17B3d",
+    "TippingRouter": "0xa832c04f9AF129De318da9c81ffC79b20e9E2286",
+    "InkStream": "0xEb40993f26Ba197E12511d4d7DF67F4A8aE2b3D4"
+  },
+  "deployedAt": "2026-05-29T17:58:58.021Z"
+}

@@ -39,9 +39,32 @@ function require_env(k) {
 function clients() {
   const account = privateKeyToAccount(require_env("PRIVATE_KEY"));
   const publicClient = createPublicClient({ chain: opnTestnet, transport: http() });
-  const walletClient = createWalletClient({ chain: opnTestnet, transport: http(), account });
+  const baseWallet = createWalletClient({ chain: opnTestnet, transport: http(), account });
+  // OPN testnet's eth_estimateGas sometimes returns 21000-ish for contract
+  // calls, which causes silent reverts. Inject a safe upper bound on every write.
+  const walletClient = {
+    ...baseWallet,
+    writeContract: (args) =>
+      baseWallet.writeContract({ gas: SAFE_GAS, ...args }),
+  };
   return { account, publicClient, walletClient };
 }
+
+// Throw if the tx ended in revert. waitForTransactionReceipt by itself returns
+// even for reverts, which would otherwise let CLI commands look successful.
+async function awaitOk(publicClient, hash) {
+  const r = await publicClient.waitForTransactionReceipt({ hash });
+  if (r.status !== "success") {
+    throw new Error(
+      `Transaction reverted on-chain (block ${r.blockNumber}, gas used ${r.gasUsed}). Hash: ${hash}`
+    );
+  }
+  return r;
+}
+
+// Some OPN testnet RPCs return a too-low gas estimate. Fall back to a sane
+// upper bound so writes don't revert silently.
+const SAFE_GAS = 800_000n;
 
 const ADDR = {
   WOPN: () => require_env("WOPN"),
@@ -71,7 +94,7 @@ async function ensureWrappedAndApproved(spender, amount) {
       args: [],
       value: need,
     });
-    await publicClient.waitForTransactionReceipt({ hash: h });
+    await awaitOk(publicClient, h);
   }
 
   const allowance = await publicClient.readContract({
@@ -88,7 +111,7 @@ async function ensureWrappedAndApproved(spender, amount) {
       functionName: "approve",
       args: [spender, amount],
     });
-    await publicClient.waitForTransactionReceipt({ hash: h });
+    await awaitOk(publicClient, h);
   }
 }
 
@@ -133,7 +156,7 @@ program
       functionName: "publish",
       args: [uri, hash],
     });
-    const r = await publicClient.waitForTransactionReceipt({ hash: txHash });
+    const r = await awaitOk(publicClient, txHash);
     console.log(kleur.green("✓ published"), kleur.gray(`block ${r.blockNumber}`));
   });
 
@@ -152,7 +175,7 @@ program
       args: [BigInt(id), opts.memo],
       value,
     });
-    await publicClient.waitForTransactionReceipt({ hash: h });
+    await awaitOk(publicClient, h);
     console.log(kleur.green(`✓ tipped ${amt} OPN to article #${id}`));
   });
 
@@ -170,7 +193,7 @@ program
       functionName: "stake",
       args: [BigInt(id), amount],
     });
-    await publicClient.waitForTransactionReceipt({ hash: h });
+    await awaitOk(publicClient, h);
     console.log(kleur.green(`✓ staked ${amt} on article #${id}`));
   });
 
@@ -185,7 +208,7 @@ program
       functionName: "unstake",
       args: [BigInt(id), parseEther(amt)],
     });
-    await publicClient.waitForTransactionReceipt({ hash: h });
+    await awaitOk(publicClient, h);
     console.log(kleur.green(`✓ unstaked ${amt} from article #${id}`));
   });
 
@@ -200,7 +223,7 @@ program
       functionName: "claim",
       args: [BigInt(id)],
     });
-    const r = await publicClient.waitForTransactionReceipt({ hash: h });
+    const r = await awaitOk(publicClient, h);
     console.log(kleur.green(`✓ claimed`), kleur.gray(`block ${r.blockNumber}`));
   });
 
@@ -249,7 +272,7 @@ program
       functionName: "open",
       args: [recipient, deposit, ratePerSecond],
     });
-    const r = await publicClient.waitForTransactionReceipt({ hash: h });
+    const r = await awaitOk(publicClient, h);
     // decode StreamOpened topic[1] (id)
     const log = r.logs.find(
       (l) => l.address.toLowerCase() === ADDR.Stream().toLowerCase()
@@ -314,7 +337,7 @@ program
       functionName: "withdraw",
       args: [BigInt(id)],
     });
-    await publicClient.waitForTransactionReceipt({ hash: h });
+    await awaitOk(publicClient, h);
     console.log(kleur.green(`✓ withdrawn from stream #${id}`));
   });
 
@@ -329,7 +352,7 @@ program
       functionName: "cancel",
       args: [BigInt(id)],
     });
-    await publicClient.waitForTransactionReceipt({ hash: h });
+    await awaitOk(publicClient, h);
     console.log(kleur.green(`✓ cancelled stream #${id}`));
   });
 
