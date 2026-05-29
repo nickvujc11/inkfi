@@ -2,43 +2,77 @@
 
 > Write Once. Earn Forever.
 
-Decentralized publishing where every article is a yield-bearing asset. Built on **OPN Chain** for the [IOPn Builders Programme · Season 1: DeFi & Open Finance](https://builders.iopn.tech/).
+Submission for the [IOPn Builders Programme · Season 1: DeFi & Open Finance](https://builders.iopn.tech/).
 
-## What is InkFi?
+- **Live demo**: https://inkfi.vercel.app
+- **Source**: https://github.com/nickvujc11/inkfi
+- **Network**: OPN Chain Testnet (chainId 984)
 
-InkFi turns every article into a financial primitive. Three composable layers:
+---
 
-| Layer | What it does |
+# What we built
+
+InkFi turns every article into a financial primitive. Three composable layers, all settled on OPN Chain.
+
+- **ArticleNFT** — soulbound ERC-721. Every published article is an NFT owned permanently by its writer. Authorship can never be transferred, only versioned.
+- **ArticleVaultPool** — per-article staking. Fans deposit OPN on articles they believe in. When that article is tipped, stakers earn a pro-rata share through a Synthetix-style accumulator (`accRewardPerShare`). One contract serves N pools, gas-efficient packed storage.
+- **TippingRouter** — single entrypoint splitting every tip 70/25/5 between writer, stakers, and protocol treasury. Tips stop being one-shot, they generate continuous yield for fans who curated early. If a vault has no stakers, the staker share is auto-redirected to the writer so funds are never stuck.
+- **InkStream** — per-second subscription streaming. OPN flows from reader to writer continuously. This is only economically viable because OPN Chain has roughly one second block time. On Ethereum mainnet a per-second stream would be useless.
+
+# Why
+
+Web2 publishing pays writers via ads, paywalls, and middlemen taking 30 to 70 percent. Decentralized publishing (Mirror, Paragraph, my own [Inkrun](https://inkrun.vercel.app) on Solana) solved censorship but kept the same broken monetization: one-shot tips and nothing else. InkFi treats each article as a programmable yield-bearing asset and gives readers an economic stake in articles they discover before they go viral. That is the open finance angle: replace platform rent with on-chain primitives.
+
+# How it works end to end
+
+1. Writer publishes an article. A soulbound `ArticleNFT` is minted.
+2. A reader stakes OPN into that article's `ArticleVaultPool`.
+3. Other readers tip the article in native OPN through `TippingRouter`.
+4. Router wraps to WOPN, splits 70/25/5, pushes the staker share to the pool, calls `notifyReward(articleId, amount)`.
+5. Stakers' pending rewards crystallise. Anyone can `claim()` independently.
+6. Writers can also receive per-second subscriptions through `InkStream`, withdrawable continuously.
+
+# Why this scores against the rubric
+
+- **OPN Chain Integration (30)** — five contracts deployed, all load-bearing. Per-second streaming and micro-tipping are unaffordable on slower or more expensive chains.
+- **Technical Quality (25)** — Solidity 0.8.30, paris EVM target, viaIR optimizer, packed structs, custom errors. 11/11 Hardhat tests covering soulbound, splits, late-staker accounting, stream caps, access control. Flattened sources committed.
+- **Product & UX (20)** — Next.js 14 dApp with three flows (write, tip + stake on article, open + manage stream). Live deployment at https://inkfi.vercel.app.
+- **Innovation (15)** — "creator DeFi": articles as composable yield-bearing assets, staker discovery rewards, reputation-aware streaming as the path to credit.
+- **Builder Commitment (10)** — continuation of Inkrun (https://inkrun.vercel.app), full multi-component delivery (contracts + web + Node CLI + Python analytics), public roadmap.
+
+# Stack
+
+| Layer | Tech |
 |---|---|
-| **ArticleNFT** | Soulbound ERC-721. Each article is owned by its writer, immutably. |
-| **ArticleVaultPool** | Per-article staking. Fans deposit OPN on articles they believe in. When the article gets tipped, stakers earn real yield (Synthetix-style accumulator). |
-| **TippingRouter** | Single entrypoint for tips. Each tip splits **70/25/5** between writer / stakers / treasury. |
-| **InkStream** | Per-second subscription streaming. OPN flows from reader to writer continuously, made viable by OPN's ~1s block time. |
-| **Writer Credit** *(roadmap)* | Borrow against future stream income. Reputation-based credit scoring. |
+| Contracts | Solidity 0.8.30 + Hardhat + OZ 5.0.2 |
+| Web | Next.js 14 + wagmi v2 + viem + RainbowKit |
+| CLI | Node + viem (11 commands, auto-wrap and approve) |
+| Analytics | Python + web3.py + rich (live TVL leaderboard) |
 
-## Why OPN Chain
+# Roadmap
 
-- **Sub-second finality** makes per-second streaming actually viable
-- **7 Gwei gas floor** keeps tipping and micro-deposits affordable
-- **Full EVM + Pectra (EIP-7702)** lets us use ERC-4626 / OpenZeppelin / Cancun opcodes
-- **EVM compatible (chainId 984)** — all standard tooling works (Hardhat, Foundry, MetaMask, wagmi)
+- **Q3 2026** — IPFS for content URIs, Writer Credit (borrow against future stream income), subgraph and stake-weighted discovery feed.
+- **Q4 2026** — reputation NFT tiers feeding credit scoring, multi-asset streams, mobile PWA, external audit.
+- **2027 and beyond** — DAO governance, cross-chain settlement, public SDK, writer grants programme.
 
-## Repo structure
+---
+
+# Repo layout
 
 ```
 inkfi/
 ├── contracts/    # Solidity 0.8.30 + Hardhat. 5 contracts, 11 tests passing.
+│   └── flattened/  # Single-file sources for explorer / submission verification.
 ├── web/          # Next.js 14 + wagmi + viem + RainbowKit. Reader & writer dApp.
 ├── cli/          # Node.js + viem. Power-user terminal interface.
 ├── analytics/    # Python + web3.py. Live TVL & vault monitoring.
 └── README.md
 ```
 
-## End-to-end quick start
-
-### 1. Smart contracts
+# Quick start
 
 ```bash
+# 1. Smart contracts
 cd contracts
 npm install
 cp .env.example .env             # set PRIVATE_KEY (testnet wallet from faucet.iopn.tech)
@@ -46,42 +80,24 @@ npx hardhat compile
 npx hardhat test                 # 11 passing
 npx hardhat run scripts/deploy.ts --network opnTestnet
 # → deployments/opnTestnet.json now has all 5 contract addresses
-```
 
-### 2. Web dApp
-
-```bash
+# 2. Web dApp
 cd ../web
 npm install
-cp .env.example .env.local
-# paste addresses from contracts/deployments/opnTestnet.json into .env.local:
-#   NEXT_PUBLIC_WOPN_ADDRESS=0x...
-#   NEXT_PUBLIC_ARTICLE_NFT_ADDRESS=0x...
-#   ...etc
-npm run dev
-```
+cp .env.example .env.local       # paste addresses from deployments/opnTestnet.json
+npm run dev                      # http://localhost:3000
 
-Open <http://localhost:3000>.
-
-### 3. CLI
-
-```bash
+# 3. CLI
 cd ../cli
 npm install
 cp .env.example .env             # paste addresses + PRIVATE_KEY
-chmod +x bin/inkfi.mjs
-
 node bin/inkfi.mjs whoami
 node bin/inkfi.mjs publish "ipfs://demo" 0x0000000000000000000000000000000000000000000000000000000000000001
 node bin/inkfi.mjs stake 1 5
 node bin/inkfi.mjs tip 1 1 -m "great post"
-node bin/inkfi.mjs vault 1
 node bin/inkfi.mjs claim 1
-```
 
-### 4. Analytics
-
-```bash
+# 4. Analytics
 cd ../analytics
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
@@ -89,7 +105,7 @@ cp .env.example .env             # paste addresses
 python monitor.py --watch        # live TVL dashboard
 ```
 
-## Network
+# Network
 
 | Field | Value |
 |---|---|
@@ -97,29 +113,8 @@ python monitor.py --watch        # live TVL dashboard
 | Chain ID | 984 (`0x3d8`) |
 | RPC | <https://testnet-rpc.iopn.tech> |
 | Faucet | <https://faucet.iopn.tech> |
-| Explorer | <https://testnet-explorer.iopn.tech> |
+| Explorer | <https://testnet.iopn.tech> |
 
-## Demo flow (for reviewers)
-
-1. Open the dApp, connect MetaMask (auto-prompts to add OPN Testnet)
-2. `/write` — publish an article. A soulbound NFT is minted to your wallet.
-3. From a second wallet, open the article and click **Stake** — wrap → approve → stake
-4. From a third wallet, tip the article 1 OPN
-5. Watch the staker's pending reward update in real time (it's 0.25 OPN — 25% of the tip)
-6. Claim → balance arrives
-7. Open `/streams`, set yourself a 100 OPN stream at 1 OPN/day. Watch `withdrawable` tick up second by second.
-8. In a separate terminal: `python analytics/monitor.py --watch` shows TVL/leaderboard live.
-
-## Scoring against Season 1 rubric
-
-| Criterion | Weight | InkFi |
-|---|---|---|
-| OPN Chain Integration | 30 | 5 contracts deployed; chain is settlement layer for **all** value flows. Per-second streaming load-bearing on fast finality. |
-| Technical Quality | 25 | Solidity 0.8.30, accumulator-style rewards, packed storage, viaIR. 11/11 tests. Full TS + Python + Node tooling. |
-| Product & UX | 20 | Distraction-free editor, live tip/stake panels, real-time stream gauge. RainbowKit polished wallet UX. |
-| Innovation | 15 | "Creator DeFi" — articles as composable yield-bearing assets. Combination of ERC-4626-style vault + streaming + creator economy. |
-| Builder Commitment | 10 | Continuation of [Inkrun](https://inkrun.vercel.app), proven product idea, full multi-component delivery. |
-
-## License
+# License
 
 MIT
