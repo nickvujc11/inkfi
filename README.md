@@ -15,6 +15,7 @@ Every article is a programmable financial primitive. Readers stake on articles t
 - One vault per article, fans stake to earn
 - Tips split 70 / 25 / 5 (writer / stakers / treasury)
 - Per-second streaming powered by sub-second finality
+- **Writer Dashboard** at `/dashboard` surfaces pending rewards, your stakes, and your articles — entirely from on-chain reads
 
 ## 🌳 System Flow
 
@@ -69,7 +70,7 @@ Subscriber ──► open() ────► InkStream (per-second)
 
 ## 📦 Tech Stack
 
-Solidity 0.8.30 · Hardhat · OpenZeppelin · Next.js 14 · wagmi + viem · RainbowKit · Node CLI · Python analytics
+Solidity 0.8.30 · Hardhat · OpenZeppelin · Next.js 14 · wagmi + viem · RainbowKit · DM Serif Display + Newsreader + DM Mono · Node CLI · Python analytics
 
 ## 🌐 Network Info
 
