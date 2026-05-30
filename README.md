@@ -91,10 +91,12 @@ Solidity 0.8.30 · Hardhat · OpenZeppelin · Next.js 14 · wagmi + viem · Rain
 ## 🧪 Status
 
 - Smart contracts: deployed ✔
-- Article NFT minting: functional ✔
-- Tipping + vault distribution: functional ✔
+- Article NFT minting: live on testnet ✔
+- Tipping + 70/25/5 split: live, verified end-to-end ✔
+- Vault staking + reward distribution: live, accumulator math confirmed (0.5 OPN stake → 0.2 OPN tip → 0.05 OPN reward = 25%) ✔
 - Per-second streaming: functional ✔
 - Web dApp live: https://inkfi.vercel.app ✔
+- Verified source on builders.iopn.tech: ✔
 
 ---
 

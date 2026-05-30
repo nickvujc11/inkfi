@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, usePublicClient } from "wagmi";
+import {
+  useAccount,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  usePublicClient,
+} from "wagmi";
 import { keccak256, toHex } from "viem";
 import { useRouter } from "next/navigation";
 import { ADDR } from "@/lib/addresses";
@@ -15,17 +20,19 @@ export default function WritePage() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
 
-  const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
+  const { writeContractAsync, data: hash, isPending, error } =
+    useWriteContract();
   const publicClient = usePublicClient();
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({ hash });
+
+  const wordCount = body.trim().split(/\s+/).filter(Boolean).length;
+  const readMin = Math.max(1, Math.ceil(wordCount / 220));
 
   async function publish() {
     if (!isConnected || !address || !publicClient) return;
     const payload = JSON.stringify({ title, body });
     const contentHash = keccak256(toHex(payload));
-    // We don't have IPFS upload in the MVP; record a local URI placeholder.
-    // The hash is the on-chain integrity anchor; the body lives in localStorage.
     const tempURI = `inkfi-local://pending`;
 
     const txHash = await writeContractAsync({
@@ -33,10 +40,12 @@ export default function WritePage() {
       abi: articleNftAbi,
       functionName: "publish",
       args: [tempURI, contentHash],
+      gas: 800_000n,
     });
 
-    const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
-    // Decode ArticlePublished event to get the new tokenId.
+    const receipt = await publicClient.waitForTransactionReceipt({
+      hash: txHash,
+    });
     const log = receipt.logs.find(
       (l) => l.address.toLowerCase() === ADDR.ArticleNFT.toLowerCase()
     );
@@ -55,35 +64,53 @@ export default function WritePage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-3xl font-serif mb-2">New Article</h1>
-      <p className="text-ink-mute text-sm mb-8">
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <div className="ink-chip mb-2">new article</div>
+          <h1 className="font-serif text-4xl font-semibold">Write</h1>
+        </div>
+        <div className="flex gap-2 text-xs font-mono text-ink-mute">
+          <span className="ink-stat">{wordCount} words</span>
+          <span className="ink-stat">~{readMin} min read</span>
+        </div>
+      </div>
+
+      <p className="text-ink-mute text-sm mb-8 max-w-2xl">
         Publishing mints a soulbound NFT to your wallet. The content hash is
-        recorded on OPN Chain. The article body is stored locally for the MVP.
+        anchored on OPN Chain. The body is cached locally for the MVP, then
+        rendered on the article page.
       </p>
 
-      <input
-        className="ink-input text-2xl font-serif mb-4"
-        placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <textarea
-        className="ink-input h-96 font-serif"
-        placeholder="Tell your story…"
-        value={body}
-        onChange={(e) => setBody(e.target.value)}
-      />
+      <div className="ink-card p-8">
+        <input
+          className="w-full bg-transparent border-0 text-3xl md:text-4xl font-serif font-semibold mb-4 focus:outline-none placeholder:text-ink-mute"
+          placeholder="An untitled story…"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <div className="h-px bg-ink-border mb-4" />
+        <textarea
+          className="w-full bg-transparent border-0 font-serif text-lg leading-relaxed h-[60vh] resize-none focus:outline-none placeholder:text-ink-mute"
+          placeholder="Tell your story. The chain is listening."
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+        />
+      </div>
 
-      <div className="mt-6 flex items-center gap-4">
+      <div className="mt-6 flex items-center gap-4 sticky bottom-4">
         <button
           className="ink-btn"
-          disabled={!isConnected || !title || !body || isPending || isConfirming}
+          disabled={
+            !isConnected || !title || !body || isPending || isConfirming
+          }
           onClick={publish}
         >
-          {isPending || isConfirming ? "Publishing…" : "✍ Publish to OPN Chain"}
+          {isPending || isConfirming
+            ? "Publishing…"
+            : "Publish to OPN Chain →"}
         </button>
         {!isConnected && (
-          <span className="text-ink-mute text-sm">Connect wallet first.</span>
+          <span className="text-ink-mute text-sm">Connect wallet to publish.</span>
         )}
       </div>
 
