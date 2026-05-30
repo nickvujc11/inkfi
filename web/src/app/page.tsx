@@ -13,13 +13,11 @@ export default function Home() {
     address: ADDR.ArticleNFT,
     abi: articleNftAbi,
     functionName: "nextId",
-    query: { refetchInterval: 5000 },
+    query: { refetchInterval: 6000 },
   });
-
   const total = nextId ? Number(nextId) : 0;
   const ids = Array.from({ length: total }, (_, i) => total - i);
 
-  // Aggregate TVL across all articles (one read per article)
   const { data: tvlReads } = useReadContracts({
     contracts: ids.map((id) => ({
       address: ADDR.Vault,
@@ -27,7 +25,7 @@ export default function Home() {
       functionName: "totalStaked",
       args: [BigInt(id)],
     })),
-    query: { enabled: ids.length > 0, refetchInterval: 5000 },
+    query: { enabled: ids.length > 0, refetchInterval: 6000 },
   });
 
   let totalTvl = 0n;
@@ -38,70 +36,75 @@ export default function Home() {
   }
 
   return (
-    <div>
+    <div className="space-y-10">
       {/* HERO */}
-      <section className="py-20 md:py-28 text-center relative">
-        <div className="ink-chip mb-8 mx-auto">
-          <span className="w-1.5 h-1.5 rounded-full bg-ink-mint animate-pulse-soft" />
-          live on OPN Chain testnet · season 1
+      <section className="text-center py-12">
+        <div
+          className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full"
+          style={{
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+          }}
+        >
+          <span className="dot dot-live"></span>
+          <span
+            className="text-[10px] font-mono uppercase"
+            style={{ color: "var(--muted)", letterSpacing: "0.25em" }}
+          >
+            live · OPN testnet · season 1
+          </span>
         </div>
-        <h1 className="font-serif text-6xl md:text-8xl font-bold tracking-tighter leading-[0.95]">
+        <h1
+          className="font-serif text-5xl md:text-7xl leading-[0.95] tracking-tight"
+          style={{ color: "var(--paper)" }}
+        >
           Write Once.
           <br />
-          <span className="relative inline-block">
-            <span className="bg-gradient-to-br from-ink-violet2 to-ink-violet bg-clip-text text-transparent">
-              Earn Forever.
-            </span>
-            <svg
-              className="absolute -bottom-3 left-0 w-full"
-              viewBox="0 0 400 12"
-              preserveAspectRatio="none"
-              aria-hidden
-            >
-              <path
-                d="M2 8 C 80 2, 200 12, 398 4"
-                stroke="url(#u-grad)"
-                strokeWidth="3"
-                strokeLinecap="round"
-                fill="none"
-                opacity="0.7"
-              />
-              <defs>
-                <linearGradient id="u-grad">
-                  <stop offset="0" stopColor="#a78bfa" />
-                  <stop offset="1" stopColor="#7c3aed" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </span>
+          <em style={{ color: "var(--gold)", fontStyle: "italic" }}>
+            Earn Forever.
+          </em>
         </h1>
-        <p className="text-ink-mute2 mt-8 max-w-xl mx-auto text-lg leading-relaxed">
+        <p
+          className="mt-6 max-w-xl mx-auto leading-relaxed font-news"
+          style={{ color: "rgba(244, 240, 232, 0.7)", fontStyle: "italic" }}
+        >
           Decentralized publishing where every article is a yield-bearing
           asset. Tip, stake, and stream OPN — fully on-chain.
         </p>
-        <div className="mt-10 flex gap-3 justify-center flex-wrap">
-          <Link href="/write" className="ink-btn">
+        <div className="mt-8 flex gap-2 justify-center flex-wrap">
+          <Link href="/write" className="btn btn-primary">
             ✍ Start Writing
           </Link>
-          <Link href="#feed" className="ink-btn-ghost">
+          <Link href="#feed" className="btn btn-ghost">
             Explore Articles ↓
           </Link>
         </div>
+      </section>
 
-        {/* Live stats strip */}
-        <div className="mt-14 grid grid-cols-3 gap-3 max-w-2xl mx-auto">
-          <Stat label="Articles" value={total.toString()} />
-          <Stat label="TVL" value={`${fmt(totalTvl, 2)} OPN`} accent />
-          <Stat label="Chain ID" value="984" mono />
-        </div>
+      {/* live stats strip */}
+      <section className="grid grid-cols-3 gap-3 max-w-3xl mx-auto">
+        <Stat label="Articles" value={total.toString()} />
+        <Stat label="Protocol TVL" value={`${fmt(totalTvl, 2)} OPN`} accent />
+        <Stat label="Chain ID" value="984" mono />
       </section>
 
       {/* WHY */}
-      <section className="py-16 border-t border-ink-border">
-        <div className="text-center mb-12">
-          <div className="ink-chip mx-auto mb-4">why inkfi</div>
-          <h2 className="font-serif text-4xl md:text-5xl font-semibold">
-            Three primitives. <span className="text-ink-violet2">One story.</span>
+      <section
+        className="py-10 border-t border-b"
+        style={{ borderColor: "var(--border)" }}
+      >
+        <div className="text-center mb-10">
+          <div
+            className="text-[10px] font-mono uppercase mb-3"
+            style={{ color: "var(--muted)", letterSpacing: "0.3em" }}
+          >
+            why inkfi
+          </div>
+          <h2 className="font-serif text-3xl md:text-4xl">
+            Three primitives.{" "}
+            <em style={{ color: "var(--gold)", fontStyle: "italic" }}>
+              One story.
+            </em>
           </h2>
         </div>
         <div className="grid md:grid-cols-3 gap-4">
@@ -125,15 +128,26 @@ export default function Home() {
               body: "Subscribers stream OPN to writers per second. Continuous income, made viable by OPN's sub-second finality.",
             },
           ].map((f) => (
-            <div key={f.num} className="ink-card p-6 ink-card-hover">
-              <div className="flex items-baseline justify-between mb-4">
-                <div className="text-4xl">{f.icon}</div>
-                <div className="font-mono text-xs text-ink-mute">{f.num}</div>
+            <div key={f.num} className="panel">
+              <div className="flex items-baseline justify-between mb-3">
+                <div className="text-3xl">{f.icon}</div>
+                <div
+                  className="font-mono text-xs"
+                  style={{ color: "var(--muted)" }}
+                >
+                  {f.num}
+                </div>
               </div>
-              <div className="font-serif font-semibold text-xl mb-2">
+              <div
+                className="font-news text-xl mb-2"
+                style={{ fontStyle: "italic" }}
+              >
                 {f.title}
               </div>
-              <div className="text-ink-mute2 text-sm leading-relaxed">
+              <div
+                className="text-sm leading-relaxed"
+                style={{ color: "rgba(244, 240, 232, 0.65)" }}
+              >
                 {f.body}
               </div>
             </div>
@@ -142,30 +156,47 @@ export default function Home() {
       </section>
 
       {/* FEED */}
-      <section id="feed" className="py-16 border-t border-ink-border">
-        <div className="flex items-baseline justify-between mb-8">
-          <div>
-            <div className="ink-chip mb-3">latest</div>
-            <h2 className="font-serif text-4xl font-semibold">Articles</h2>
+      <section id="feed">
+        <div className="flex items-center gap-4 mb-6">
+          <div
+            className="text-[10px] font-mono uppercase whitespace-nowrap"
+            style={{ color: "var(--muted)", letterSpacing: "0.3em" }}
+          >
+            Latest articles
           </div>
-          <span className="text-ink-mute text-sm font-mono">
+          <div
+            className="flex-1 h-px"
+            style={{ background: "var(--border)" }}
+          ></div>
+          <span
+            className="text-[10px] font-mono"
+            style={{ color: "var(--muted)", letterSpacing: "0.1em" }}
+          >
             sorted by recency · live from chain
           </span>
         </div>
 
         {total === 0 ? (
-          <div className="ink-card p-16 text-center">
+          <div className="panel text-center py-20">
             <div className="text-5xl mb-4">✍</div>
-            <div className="font-serif text-xl mb-2">No articles yet.</div>
-            <div className="text-ink-mute mb-6">
+            <div
+              className="font-news text-xl mb-2"
+              style={{ fontStyle: "italic" }}
+            >
+              No articles yet.
+            </div>
+            <div
+              className="text-sm mb-6"
+              style={{ color: "var(--muted)" }}
+            >
               Be the first writer on InkFi.
             </div>
-            <Link href="/write" className="ink-btn">
+            <Link href="/write" className="btn btn-primary">
               Publish the first article
             </Link>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
             {ids.map((id, i) => (
               <ArticleCard key={id} id={id} index={i} />
             ))}
@@ -188,14 +219,16 @@ function Stat({
   accent?: boolean;
 }) {
   return (
-    <div className="ink-stat text-left">
-      <div className="text-[10px] uppercase tracking-widest text-ink-mute font-mono">
+    <div className="stat-card">
+      <div
+        className="text-[10px] font-mono uppercase"
+        style={{ color: "var(--muted)", letterSpacing: "0.2em" }}
+      >
         {label}
       </div>
       <div
-        className={`mt-1 ${mono ? "font-mono" : "font-serif"} text-xl font-semibold ${
-          accent ? "text-ink-violet2" : "text-ink-paper"
-        }`}
+        className={`mt-1.5 text-2xl ${mono ? "font-mono" : "font-serif"}`}
+        style={{ color: accent ? "var(--gold-light)" : "var(--paper)" }}
       >
         {value}
       </div>
@@ -225,7 +258,7 @@ function ArticleCard({ id, index }: { id: number; index: number }) {
 
   if (!data) {
     return (
-      <div className="ink-card p-6 space-y-3">
+      <div className="panel-soft p-5 space-y-3">
         <div className="skeleton h-3 w-24" />
         <div className="skeleton h-6 w-2/3" />
         <div className="skeleton h-4 w-full" />
@@ -242,39 +275,69 @@ function ArticleCard({ id, index }: { id: number; index: number }) {
     `0x${string}`,
   ];
 
+  const tvlVal = (tvl as bigint | undefined) ?? 0n;
+
   return (
     <Link
       href={`/article/${id}`}
-      className="block animate-slide-up"
+      className="block animate-fade-up"
       style={{ animationDelay: `${index * 60}ms` }}
     >
-      <article className="ink-card ink-card-hover p-6 h-full">
-        <div className="flex items-center justify-between text-xs mb-3">
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-ink-mute">#{id}</span>
-            <span className="ink-chip">v{version}</span>
-            {(tvl as bigint | undefined) && (tvl as bigint) > 0n && (
-              <span className="ink-chip" style={{ background: "rgba(245,158,11,0.1)", borderColor: "rgba(245,158,11,0.3)", color: "#f59e0b" }}>
-                ◈ {fmt(tvl as bigint, 2)} staked
-              </span>
-            )}
-          </div>
-          <span className="text-ink-mute font-mono">
-            {new Date(Number(createdAt) * 1000).toLocaleDateString(undefined, {
-              month: "short",
-              day: "numeric",
-            })}
-          </span>
+      <article
+        className="panel-soft p-5 h-full transition"
+        style={{
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          aria-hidden
+          className="absolute top-3 right-4 font-serif"
+          style={{
+            fontSize: "44px",
+            color: "rgba(255, 255, 255, 0.04)",
+            lineHeight: 1,
+          }}
+        >
+          {String(id).padStart(2, "0")}
         </div>
-        <h3 className="font-serif text-2xl font-semibold leading-tight line-clamp-2 mb-3">
-          {local?.title ?? <span className="text-ink-mute italic">(off-chain title not in cache)</span>}
+        <div className="flex items-center gap-2 mb-3 relative z-10">
+          <span className="pill pill-mute font-mono">#{id}</span>
+          <span className="pill pill-mute">v{version}</span>
+          {tvlVal > 0n && (
+            <span className="pill pill-gold">
+              <span className="dot dot-gold"></span>
+              {fmt(tvlVal, 2)} staked
+            </span>
+          )}
+        </div>
+        <h3
+          className="font-news text-xl leading-snug mb-3 line-clamp-2"
+          style={{ fontStyle: "italic", color: "var(--paper)" }}
+        >
+          {local?.title ?? (
+            <span style={{ color: "var(--muted)" }}>
+              (off-chain title not in cache)
+            </span>
+          )}
         </h3>
-        <p className="text-ink-mute2 text-sm leading-relaxed line-clamp-3 mb-4">
-          {local?.body?.slice(0, 240) ?? contentURI}
+        <p
+          className="text-sm leading-relaxed line-clamp-3 mb-4"
+          style={{ color: "rgba(244, 240, 232, 0.55)" }}
+        >
+          {local?.body?.slice(0, 200) ?? contentURI}
         </p>
-        <div className="flex items-center justify-between text-xs text-ink-mute pt-3 border-t border-ink-border">
+        <div
+          className="flex items-center justify-between text-xs pt-3"
+          style={{
+            borderTop: "1px solid var(--border)",
+            color: "var(--muted)",
+          }}
+        >
           <span className="font-mono">{shortAddr(writer)}</span>
-          <span className="text-ink-violet2 font-medium">Read →</span>
+          <span style={{ color: "var(--gold)" }} className="font-mono">
+            read →
+          </span>
         </div>
       </article>
     </Link>

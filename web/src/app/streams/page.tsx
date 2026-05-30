@@ -15,21 +15,30 @@ import { TxStatus } from "@/components/PendingTx";
 
 export default function StreamsPage() {
   return (
-    <div>
-      <div className="mb-12">
-        <div className="ink-chip mb-3">∞ inkstream</div>
-        <h1 className="font-serif text-5xl font-bold tracking-tight">
-          Streams
-        </h1>
-        <p className="text-ink-mute2 mt-3 max-w-2xl leading-relaxed">
-          Subscribe to a writer with a per-second stream of OPN. The writer can
-          withdraw continuously. You can cancel any time and reclaim the
-          unstreamed remainder. OPN Chain&apos;s ~1s block time makes this feel
+    <div className="space-y-8">
+      <div>
+        <div
+          className="text-[10px] font-mono uppercase mb-2"
+          style={{ color: "var(--muted)", letterSpacing: "0.3em" }}
+        >
+          ∞ inkstream
+        </div>
+        <h1 className="font-serif text-4xl mb-3">Streams</h1>
+        <p
+          className="font-news max-w-2xl leading-relaxed"
+          style={{
+            color: "rgba(244, 240, 232, 0.7)",
+            fontStyle: "italic",
+          }}
+        >
+          Subscribe to a writer with a per-second stream of OPN. The writer
+          can withdraw continuously. You can cancel any time and reclaim the
+          unstreamed remainder. OPN Chain&apos;s ~1s block time makes it feel
           live.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-5">
         <OpenStream />
         <ManageStream />
       </div>
@@ -105,51 +114,61 @@ function OpenStream() {
   }
 
   return (
-    <div className="ink-card p-6">
-      <div className="font-semibold mb-1 flex items-center gap-2">
-        <span className="text-ink-violet2">→</span> Open new stream
+    <div className="panel">
+      <div className="flex items-center justify-between mb-1">
+        <div className="font-news text-[15px]" style={{ fontStyle: "italic" }}>
+          → Open new stream
+        </div>
+        <span className="pill pill-live">
+          <span className="dot dot-stream"></span> live
+        </span>
       </div>
-      <div className="text-xs text-ink-mute mb-5">
+      <div
+        className="text-[11px] mb-5 font-mono"
+        style={{ color: "var(--muted)" }}
+      >
         Sender pays in WOPN. Recipient withdraws continuously.
       </div>
 
-      <label className="text-[10px] uppercase tracking-widest text-ink-mute font-mono">
-        recipient address
-      </label>
-      <input
-        className="ink-input mt-1 mb-4 font-mono text-sm"
-        placeholder="0x…"
-        value={recipient}
-        onChange={(e) => setRecipient(e.target.value)}
-      />
+      <Field label="recipient address">
+        <input
+          className="ink-input"
+          placeholder="0x…"
+          value={recipient}
+          onChange={(e) => setRecipient(e.target.value)}
+        />
+      </Field>
 
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div>
-          <label className="text-[10px] uppercase tracking-widest text-ink-mute font-mono">
-            deposit · OPN
-          </label>
+      <div className="grid grid-cols-2 gap-3 mt-3">
+        <Field label="deposit · OPN">
           <input
-            className="ink-input mt-1 font-mono"
+            className="ink-input"
             type="number"
             value={deposit}
             onChange={(e) => setDeposit(e.target.value)}
           />
-        </div>
-        <div>
-          <label className="text-[10px] uppercase tracking-widest text-ink-mute font-mono">
-            rate · OPN/day
-          </label>
+        </Field>
+        <Field label="rate · OPN/day">
           <input
-            className="ink-input mt-1 font-mono"
+            className="ink-input"
             type="number"
             value={perDay}
             onChange={(e) => setPerDay(e.target.value)}
           />
-        </div>
+        </Field>
       </div>
 
-      <div className="ink-stat text-xs mb-4">
-        <div className="text-[10px] uppercase tracking-widest text-ink-mute font-mono">
+      <div
+        className="mt-4 mb-4 p-3 rounded-md"
+        style={{
+          background: "rgba(0, 0, 0, 0.3)",
+          border: "1px solid var(--border)",
+        }}
+      >
+        <div
+          className="text-[9px] font-mono uppercase"
+          style={{ color: "var(--muted)", letterSpacing: "0.2em" }}
+        >
           duration estimate
         </div>
         <div className="font-mono mt-0.5">
@@ -158,12 +177,16 @@ function OpenStream() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <button className="ink-btn-ghost text-xs" onClick={wrap} disabled={isPending}>
+        <button
+          className="btn btn-ghost text-[11px]"
+          onClick={wrap}
+          disabled={isPending}
+        >
           1 · Wrap {deposit} OPN
         </button>
         {needsApproval && (
           <button
-            className="ink-btn-ghost text-xs"
+            className="btn btn-ghost text-[11px]"
             onClick={approve}
             disabled={isPending}
           >
@@ -171,7 +194,7 @@ function OpenStream() {
           </button>
         )}
         <button
-          className="ink-btn"
+          className="btn btn-primary justify-center"
           disabled={isPending || isConfirming || !recipient || needsApproval}
           onClick={open}
         >
@@ -244,67 +267,96 @@ function ManageStream() {
   const empty = !s || s[0] === "0x0000000000000000000000000000000000000000";
 
   return (
-    <div className="ink-card p-6">
-      <div className="font-semibold mb-1 flex items-center gap-2">
-        <span className="text-ink-violet2">⤺</span> Manage stream
+    <div className="panel">
+      <div className="flex items-center justify-between mb-1">
+        <div className="font-news text-[15px]" style={{ fontStyle: "italic" }}>
+          ⤺ Manage stream
+        </div>
       </div>
-      <div className="text-xs text-ink-mute mb-5">
+      <div
+        className="text-[11px] mb-5 font-mono"
+        style={{ color: "var(--muted)" }}
+      >
         Withdraw or cancel an existing stream by ID.
       </div>
 
-      <label className="text-[10px] uppercase tracking-widest text-ink-mute font-mono">
-        stream id
-      </label>
-      <input
-        className="ink-input mt-1 mb-5 font-mono"
-        type="number"
-        min="1"
-        value={streamId}
-        onChange={(e) => setStreamId(e.target.value)}
-      />
+      <Field label="stream id">
+        <input
+          className="ink-input"
+          type="number"
+          min="1"
+          value={streamId}
+          onChange={(e) => setStreamId(e.target.value)}
+        />
+      </Field>
 
       {empty ? (
-        <div className="text-ink-mute text-sm py-4 text-center border border-dashed border-ink-border rounded-md">
+        <div
+          className="mt-5 text-sm py-6 text-center rounded-md"
+          style={{
+            color: "var(--muted)",
+            border: "1px dashed var(--border)",
+          }}
+        >
           No stream with ID {streamId}.
           <br />
           New streams are numbered sequentially from 1.
         </div>
       ) : (
-        <div className="space-y-2 text-sm">
-          <Row label="sender" value={shortAddr(s![0])} mono />
-          <Row label="recipient" value={shortAddr(s![1])} mono />
-          <Row label="deposited" value={`${fmt(s![2], 4)} WOPN`} mono />
-          <Row label="withdrawn" value={`${fmt(s![3], 4)} WOPN`} mono />
-          <Row label="rate" value={`${fmt(s![4] * 86400n, 3)} /day`} mono />
+        <div className="space-y-2 mt-5 text-sm">
+          <Row label="sender" value={shortAddr(s![0])} />
+          <Row label="recipient" value={shortAddr(s![1])} />
+          <Row label="deposited" value={`${fmt(s![2], 4)} WOPN`} />
+          <Row label="withdrawn" value={`${fmt(s![3], 4)} WOPN`} />
+          <Row label="rate" value={`${fmt(s![4] * 86400n, 3)} /day`} />
           <Row
             label="status"
             value={
               s![6] === 0n ? (
-                <span className="text-emerald-400 font-medium">● active</span>
+                <span style={{ color: "var(--yield)" }}>● active</span>
               ) : (
-                <span className="text-ink-mute">○ stopped</span>
+                <span style={{ color: "var(--muted)" }}>○ stopped</span>
               )
             }
           />
-          <div className="border-t border-ink-border pt-3 mt-3">
-            <div className="ink-stat bg-gradient-to-br from-ink-violet/10 to-transparent border-ink-violet/30 mb-2">
-              <div className="text-[10px] uppercase tracking-widest text-ink-violet2 font-mono">
+          <div
+            className="pt-3 mt-3"
+            style={{ borderTop: "1px solid var(--border)" }}
+          >
+            <div
+              className="p-3 rounded-md mb-2"
+              style={{
+                background: "rgba(14, 165, 233, 0.08)",
+                border: "1px solid rgba(14, 165, 233, 0.25)",
+              }}
+            >
+              <div
+                className="text-[9px] font-mono uppercase"
+                style={{ color: "var(--stream)", letterSpacing: "0.2em" }}
+              >
                 withdrawable now
               </div>
-              <div className="font-mono mt-0.5 text-2xl text-ink-violet2 font-semibold tabular-nums">
+              <div
+                className="font-serif text-[24px] mt-0.5"
+                style={{ color: "var(--stream)" }}
+              >
                 {fmt(withdrawable as bigint | undefined, 6)}
-                <span className="text-sm text-ink-mute ml-1">WOPN</span>
+                <span
+                  className="text-xs ml-1 font-mono"
+                  style={{ color: "var(--muted)" }}
+                >
+                  WOPN
+                </span>
               </div>
             </div>
             <Row
               label="remaining"
               value={`${fmt(remaining as bigint | undefined, 4)} WOPN`}
-              mono
             />
           </div>
           <div className="flex gap-2 mt-4">
             <button
-              className="ink-btn flex-1"
+              className="btn btn-primary flex-1 justify-center"
               onClick={() =>
                 writeContractAsync({
                   address: ADDR.Stream,
@@ -319,7 +371,7 @@ function ManageStream() {
               Withdraw
             </button>
             <button
-              className="ink-btn-ghost flex-1"
+              className="btn btn-ghost flex-1 justify-center"
               onClick={() =>
                 writeContractAsync({
                   address: ADDR.Stream,
@@ -347,21 +399,42 @@ function ManageStream() {
   );
 }
 
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label
+        className="text-[10px] uppercase font-mono block mb-1"
+        style={{ color: "var(--muted)", letterSpacing: "0.2em" }}
+      >
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
 function Row({
   label,
   value,
-  mono,
 }: {
   label: string;
   value: React.ReactNode;
-  mono?: boolean;
 }) {
   return (
     <div className="flex justify-between items-center text-sm py-0.5">
-      <span className="text-ink-mute text-xs uppercase tracking-wider font-mono">
+      <span
+        className="text-[11px] uppercase font-mono"
+        style={{ color: "var(--muted)", letterSpacing: "0.15em" }}
+      >
         {label}
       </span>
-      <span className={mono ? "font-mono text-ink-paper" : "text-ink-paper"}>
+      <span className="font-mono" style={{ color: "var(--paper)" }}>
         {value}
       </span>
     </div>

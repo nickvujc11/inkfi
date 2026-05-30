@@ -56,65 +56,91 @@ export default function ArticlePage({ params }: { params: Promise<Params> }) {
 
   if (!article) {
     return (
-      <div className="text-ink-mute text-center py-20">
+      <div className="text-center py-20" style={{ color: "var(--muted)" }}>
         Loading article from OPN Chain…
       </div>
     );
   }
 
-  const [writer, createdAt, version, contentURI, contentHash] = article as readonly [
-    `0x${string}`,
-    bigint,
-    number,
-    string,
-    `0x${string}`,
-  ];
+  const [writer, createdAt, version, contentURI, contentHash] =
+    article as readonly [
+      `0x${string}`,
+      bigint,
+      number,
+      string,
+      `0x${string}`,
+    ];
 
   const myStaked = userInfo
     ? (userInfo as unknown as readonly [bigint, bigint, bigint])[0]
     : 0n;
 
-  const wordCount = (local?.body ?? "").trim().split(/\s+/).filter(Boolean).length;
+  const wordCount = (local?.body ?? "").trim().split(/\s+/).filter(Boolean)
+    .length;
   const readMin = Math.max(1, Math.ceil(wordCount / 220));
 
   return (
-    <div className="grid md:grid-cols-3 gap-10">
-      <article className="md:col-span-2">
+    <div className="grid lg:grid-cols-[1fr_360px] gap-10">
+      <article>
         <div className="flex items-center gap-2 mb-4">
-          <span className="ink-chip">#{idStr}</span>
-          <span className="ink-chip">v{version}</span>
-          <span className="text-xs text-ink-mute font-mono">
+          <span className="pill pill-mute font-mono">#{idStr}</span>
+          <span className="pill pill-mute">v{version}</span>
+          <span
+            className="text-[11px] font-mono"
+            style={{ color: "var(--muted)" }}
+          >
             by {shortAddr(writer)}
           </span>
         </div>
-        <h1 className="font-serif text-5xl font-bold leading-tight tracking-tight mb-4">
-          {local?.title ?? <span className="text-ink-mute italic">(off-chain title not in cache)</span>}
+        <h1
+          className="font-serif text-4xl md:text-5xl leading-tight tracking-tight mb-4"
+          style={{ color: "var(--paper)" }}
+        >
+          {local?.title ?? (
+            <span style={{ color: "var(--muted)", fontStyle: "italic" }}>
+              (off-chain title not in cache)
+            </span>
+          )}
         </h1>
-        <div className="flex items-center gap-3 text-xs text-ink-mute mb-10 font-mono">
-          <span>{new Date(Number(createdAt) * 1000).toLocaleDateString(undefined, { dateStyle: "long" })}</span>
+        <div
+          className="flex items-center gap-3 text-[11px] mb-10 font-mono flex-wrap"
+          style={{ color: "var(--muted)", letterSpacing: "0.05em" }}
+        >
+          <span>
+            {new Date(Number(createdAt) * 1000).toLocaleDateString(undefined, {
+              dateStyle: "long",
+            })}
+          </span>
           <span>·</span>
-          <span>{wordCount} words · {readMin} min</span>
+          <span>
+            {wordCount} words · {readMin} min read
+          </span>
           <span>·</span>
           <span title={contentHash}>hash {contentHash.slice(0, 10)}…</span>
         </div>
         <div className="prose-ink whitespace-pre-wrap">
           {local?.body ?? (
-            <span className="text-ink-mute italic">
+            <span style={{ color: "var(--muted)", fontStyle: "italic" }}>
               (Article body is stored locally for the MVP. Open this article on
               the device where it was published, or wire up IPFS to fetch from
               the contentURI on-chain.)
             </span>
           )}
         </div>
-        <div className="mt-16 pt-6 border-t border-ink-border text-xs text-ink-mute font-mono">
+        <div
+          className="mt-16 pt-5 text-[11px] font-mono"
+          style={{
+            borderTop: "1px solid var(--border)",
+            color: "var(--muted)",
+          }}
+        >
           contentURI · {contentURI}
         </div>
       </article>
 
-      <aside className="space-y-4 md:sticky md:top-24 self-start">
+      <aside className="space-y-4 lg:sticky lg:top-24 self-start">
         <TipPanel
           articleId={id}
-          writer={writer}
           onTipped={() => {
             refetchTotal();
             refetchPending();
@@ -139,11 +165,9 @@ export default function ArticlePage({ params }: { params: Promise<Params> }) {
 
 function TipPanel({
   articleId,
-  writer,
   onTipped,
 }: {
   articleId: bigint;
-  writer: `0x${string}`;
   onTipped: () => void;
 }) {
   const [amt, setAmt] = useState("0.1");
@@ -163,33 +187,39 @@ function TipPanel({
   }, [isSuccess, onTipped, reset]);
 
   return (
-    <div className="ink-card p-5">
+    <div className="panel">
       <div className="flex items-center justify-between mb-1">
-        <div className="text-sm font-semibold flex items-center gap-1.5">
-          <span className="text-ink-amber">◎</span> Tip the writer
+        <div
+          className="font-news text-[15px]"
+          style={{ fontStyle: "italic" }}
+        >
+          ◎ Tip the writer
         </div>
-        <span className="ink-chip">native OPN</span>
+        <span className="pill pill-mute">native OPN</span>
       </div>
-      <div className="text-xs text-ink-mute mb-4">
+      <div
+        className="text-[11px] mb-4 font-mono"
+        style={{ color: "var(--muted)", letterSpacing: "0.05em" }}
+      >
         70% writer · 25% stakers · 5% treasury
       </div>
       <input
-        className="ink-input mb-2 font-mono"
+        className="ink-input mb-2"
         type="number"
         step="0.01"
         min="0.001"
         value={amt}
         onChange={(e) => setAmt(e.target.value)}
-        placeholder="OPN"
+        placeholder="OPN amount"
       />
       <input
-        className="ink-input mb-3 text-sm"
+        className="ink-input mb-3"
         value={memo}
         onChange={(e) => setMemo(e.target.value)}
         placeholder="memo (optional)"
       />
       <button
-        className="ink-btn w-full"
+        className="btn btn-primary w-full justify-center"
         disabled={isPending || isConfirming || !amt}
         onClick={() =>
           writeContractAsync({
@@ -316,51 +346,81 @@ function StakePanel({
     mode === "stake" && ((allowance as bigint | undefined) ?? 0n) < need;
 
   return (
-    <div className="ink-card p-5">
+    <div className="panel">
       <div className="flex items-center justify-between mb-1">
-        <div className="text-sm font-semibold flex items-center gap-1.5">
-          <span className="text-ink-violet2">◈</span> Vault
+        <div
+          className="font-news text-[15px]"
+          style={{ fontStyle: "italic" }}
+        >
+          ⬡ Vault
         </div>
-        <span className="ink-chip">live</span>
+        <span className="pill pill-yield">
+          <span className="dot dot-live"></span> live
+        </span>
       </div>
-      <div className="text-xs text-ink-mute mb-4">
+      <div
+        className="text-[11px] mb-4 font-mono"
+        style={{ color: "var(--muted)", letterSpacing: "0.05em" }}
+      >
         Stake OPN. Earn from tips paid to this article.
       </div>
 
-      <div className="grid grid-cols-2 gap-2 text-xs mb-4">
-        <div className="ink-stat">
-          <div className="text-[10px] uppercase tracking-widest text-ink-mute">TVL</div>
-          <div className="font-mono mt-0.5 text-base">{fmt(totalStaked, 4)}</div>
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        <Tile label="Pool TVL" value={fmt(totalStaked, 4)} />
+        <Tile label="Your Stake" value={fmt(myStaked, 4)} />
+      </div>
+
+      <div
+        className="p-3 rounded-lg mb-4"
+        style={{
+          background: "rgba(201, 168, 76, 0.08)",
+          border: "1px solid rgba(201, 168, 76, 0.2)",
+        }}
+      >
+        <div
+          className="text-[9px] font-mono uppercase mb-1"
+          style={{ color: "var(--gold)", letterSpacing: "0.2em" }}
+        >
+          Pending Reward
         </div>
-        <div className="ink-stat">
-          <div className="text-[10px] uppercase tracking-widest text-ink-mute">your stake</div>
-          <div className="font-mono mt-0.5 text-base">{fmt(myStaked, 4)}</div>
-        </div>
-        <div className="ink-stat col-span-2 border-ink-violet/30 bg-gradient-to-br from-ink-violet/10 to-transparent">
-          <div className="text-[10px] uppercase tracking-widest text-ink-violet2">pending reward</div>
-          <div className="font-mono mt-0.5 text-xl text-ink-violet2 font-semibold">
-            {fmt(pending, 6)} <span className="text-sm text-ink-mute">OPN</span>
-          </div>
+        <div
+          className="font-serif text-[22px]"
+          style={{ color: "var(--gold-light)" }}
+        >
+          {fmt(pending, 6)}
+          <span className="text-xs ml-1" style={{ color: "var(--muted)" }}>
+            OPN
+          </span>
         </div>
       </div>
 
-      <div className="flex gap-1 mb-3 text-xs p-1 bg-ink-bg rounded-md border border-ink-border">
+      <div
+        className="flex gap-1 mb-3 p-1 rounded-lg"
+        style={{
+          background: "rgba(0, 0, 0, 0.3)",
+          border: "1px solid var(--border)",
+        }}
+      >
         <button
-          className={`flex-1 py-1.5 rounded transition ${
+          className={`flex-1 py-1.5 rounded text-xs font-mono transition ${
             mode === "stake"
-              ? "bg-ink-violet text-ink-paper font-semibold"
-              : "text-ink-mute2 hover:text-white"
+              ? "font-medium"
+              : ""
           }`}
+          style={{
+            background: mode === "stake" ? "var(--gold)" : "transparent",
+            color: mode === "stake" ? "var(--ink-deep)" : "var(--muted)",
+          }}
           onClick={() => setMode("stake")}
         >
           Stake
         </button>
         <button
-          className={`flex-1 py-1.5 rounded transition ${
-            mode === "unstake"
-              ? "bg-ink-violet text-ink-paper font-semibold"
-              : "text-ink-mute2 hover:text-white"
-          }`}
+          className={`flex-1 py-1.5 rounded text-xs font-mono transition`}
+          style={{
+            background: mode === "unstake" ? "var(--gold)" : "transparent",
+            color: mode === "unstake" ? "var(--ink-deep)" : "var(--muted)",
+          }}
           onClick={() => setMode("unstake")}
         >
           Unstake
@@ -368,7 +428,7 @@ function StakePanel({
       </div>
 
       <input
-        className="ink-input mb-3 font-mono"
+        className="ink-input mb-3"
         type="number"
         step="0.01"
         min="0"
@@ -378,15 +438,16 @@ function StakePanel({
 
       {mode === "stake" ? (
         <>
-          <div className="text-xs text-ink-mute mb-2 flex justify-between">
+          <div
+            className="text-[11px] mb-2 flex justify-between font-mono"
+            style={{ color: "var(--muted)" }}
+          >
             <span>WOPN balance</span>
-            <span className="font-mono">
-              {fmt(wopnBal as bigint | undefined, 4)}
-            </span>
+            <span>{fmt(wopnBal as bigint | undefined, 4)}</span>
           </div>
           <div className="flex flex-col gap-1.5">
             <button
-              className="ink-btn-ghost text-xs"
+              className="btn btn-ghost text-[11px]"
               onClick={wrap}
               disabled={isPending}
             >
@@ -394,7 +455,7 @@ function StakePanel({
             </button>
             {needsApproval && (
               <button
-                className="ink-btn-ghost text-xs"
+                className="btn btn-ghost text-[11px]"
                 onClick={approve}
                 disabled={isPending}
               >
@@ -402,19 +463,23 @@ function StakePanel({
               </button>
             )}
             <button
-              className="ink-btn"
+              className="btn btn-primary justify-center"
               disabled={
                 !isConnected || isPending || isConfirming || needsApproval
               }
               onClick={stake}
             >
-              {needsApproval ? "Approve to enable stake" : `Stake ${amt} WOPN`}
+              {needsApproval
+                ? "Approve to enable"
+                : isPending || isConfirming
+                  ? "Staking…"
+                  : `Stake ${amt} WOPN`}
             </button>
           </div>
         </>
       ) : (
         <button
-          className="ink-btn w-full"
+          className="btn btn-primary w-full justify-center"
           disabled={!isConnected || isPending || isConfirming}
           onClick={unstake}
         >
@@ -424,7 +489,12 @@ function StakePanel({
 
       {((pending as bigint | undefined) ?? 0n) > 0n && (
         <button
-          className="mt-3 w-full text-xs py-2.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/15 font-medium transition"
+          className="mt-3 w-full text-xs py-2.5 rounded-lg transition font-medium"
+          style={{
+            background: "rgba(16, 185, 129, 0.1)",
+            border: "1px solid rgba(16, 185, 129, 0.3)",
+            color: "var(--yield)",
+          }}
           onClick={claim}
           disabled={isPending || isConfirming}
         >
@@ -439,6 +509,31 @@ function StakePanel({
         isConfirmed={isSuccess}
         error={error}
       />
+    </div>
+  );
+}
+
+function Tile({ label, value }: { label: string; value: string }) {
+  return (
+    <div
+      className="p-2.5 rounded-md"
+      style={{
+        background: "rgba(0, 0, 0, 0.25)",
+        border: "1px solid var(--border)",
+      }}
+    >
+      <div
+        className="text-[9px] uppercase font-mono"
+        style={{ color: "var(--muted)", letterSpacing: "0.2em" }}
+      >
+        {label}
+      </div>
+      <div
+        className="font-mono text-base mt-0.5"
+        style={{ color: "var(--paper)" }}
+      >
+        {value}
+      </div>
     </div>
   );
 }

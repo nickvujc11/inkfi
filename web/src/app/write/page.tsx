@@ -64,33 +64,61 @@ export default function WritePage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex items-start justify-between flex-wrap gap-3">
         <div>
-          <div className="ink-chip mb-2">new article</div>
-          <h1 className="font-serif text-4xl font-semibold">Write</h1>
+          <div
+            className="text-[10px] font-mono uppercase mb-2"
+            style={{ color: "var(--muted)", letterSpacing: "0.3em" }}
+          >
+            new article
+          </div>
+          <h1 className="font-serif text-4xl">Write</h1>
         </div>
-        <div className="flex gap-2 text-xs font-mono text-ink-mute">
-          <span className="ink-stat">{wordCount} words</span>
-          <span className="ink-stat">~{readMin} min read</span>
+        <div
+          className="flex gap-2 text-[11px] font-mono"
+          style={{ color: "var(--muted)" }}
+        >
+          <span
+            className="px-3 py-1.5 rounded"
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            {wordCount} words
+          </span>
+          <span
+            className="px-3 py-1.5 rounded"
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            ~{readMin} min read
+          </span>
         </div>
       </div>
 
-      <p className="text-ink-mute text-sm mb-8 max-w-2xl">
+      <p
+        className="text-sm mb-6 max-w-2xl font-news"
+        style={{ color: "var(--muted)", fontStyle: "italic" }}
+      >
         Publishing mints a soulbound NFT to your wallet. The content hash is
-        anchored on OPN Chain. The body is cached locally for the MVP, then
-        rendered on the article page.
+        anchored on OPN Chain. The body is cached locally for the MVP.
       </p>
 
-      <div className="ink-card p-8">
+      <div className="panel">
         <input
-          className="w-full bg-transparent border-0 text-3xl md:text-4xl font-serif font-semibold mb-4 focus:outline-none placeholder:text-ink-mute"
+          className="w-full bg-transparent border-0 text-3xl md:text-4xl font-serif mb-3 focus:outline-none"
+          style={{ color: "var(--paper)" }}
           placeholder="An untitled story…"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-        <div className="h-px bg-ink-border mb-4" />
+        <div className="h-px mb-4" style={{ background: "var(--border)" }} />
         <textarea
-          className="w-full bg-transparent border-0 font-serif text-lg leading-relaxed h-[60vh] resize-none focus:outline-none placeholder:text-ink-mute"
+          className="w-full bg-transparent border-0 font-news text-lg leading-relaxed h-[60vh] resize-none focus:outline-none"
+          style={{ color: "var(--paper)" }}
           placeholder="Tell your story. The chain is listening."
           value={body}
           onChange={(e) => setBody(e.target.value)}
@@ -99,7 +127,7 @@ export default function WritePage() {
 
       <div className="mt-6 flex items-center gap-4 sticky bottom-4">
         <button
-          className="ink-btn"
+          className="btn btn-primary"
           disabled={
             !isConnected || !title || !body || isPending || isConfirming
           }
@@ -110,7 +138,12 @@ export default function WritePage() {
             : "Publish to OPN Chain →"}
         </button>
         {!isConnected && (
-          <span className="text-ink-mute text-sm">Connect wallet to publish.</span>
+          <span
+            className="text-xs"
+            style={{ color: "var(--muted)" }}
+          >
+            Connect wallet to publish.
+          </span>
         )}
       </div>
 
