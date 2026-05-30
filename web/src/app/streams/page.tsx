@@ -15,30 +15,22 @@ import { TxStatus } from "@/components/PendingTx";
 
 export default function StreamsPage() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
-        <div
-          className="text-[10px] font-mono uppercase mb-2"
-          style={{ color: "var(--muted)", letterSpacing: "0.3em" }}
-        >
-          ∞ inkstream
+        <div className="section-mast">
+          <span className="num">∮</span>
+          <span className="label">Patronage</span>
+          <span className="meta">per-second subscription</span>
         </div>
-        <h1 className="font-serif text-4xl mb-3">Streams</h1>
-        <p
-          className="font-news max-w-2xl leading-relaxed"
-          style={{
-            color: "rgba(244, 240, 232, 0.7)",
-            fontStyle: "italic",
-          }}
-        >
-          Subscribe to a writer with a per-second stream of OPN. The writer
-          can withdraw continuously. You can cancel any time and reclaim the
-          unstreamed remainder. OPN Chain&apos;s ~1s block time makes it feel
-          live.
+        <p className="font-display italic text-paper-mute max-w-2xl text-[18px] leading-relaxed">
+          Subscribe to a writer with a per-second flow of OPN. The writer
+          withdraws continuously. You may revoke at any time and reclaim the
+          unstreamed remainder. OPN Chain&apos;s sub-second finality makes this
+          feel alive.
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-5">
+      <div className="grid lg:grid-cols-2 gap-6">
         <OpenStream />
         <ManageStream />
       </div>
@@ -60,11 +52,8 @@ function OpenStream() {
     query: { enabled: !!address },
   });
 
-  const { writeContractAsync, data: hash, isPending, error, reset } =
-    useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash,
-  });
+  const { writeContractAsync, data: hash, isPending, error, reset } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
   useEffect(() => {
     if (isSuccess) {
       refetchAllow();
@@ -74,9 +63,7 @@ function OpenStream() {
   }, [isSuccess, refetchAllow, reset]);
 
   const ratePerSecond =
-    parseEther(perDay || "0") > 0n
-      ? parseEther(perDay || "0") / 86400n
-      : 0n;
+    parseEther(perDay || "0") > 0n ? parseEther(perDay || "0") / 86400n : 0n;
   const depositWei = parseEther(deposit || "0");
   const needsApproval = ((allowance as bigint | undefined) ?? 0n) < depositWei;
   const durationDays =
@@ -114,19 +101,14 @@ function OpenStream() {
   }
 
   return (
-    <div className="panel">
+    <div className="surface p-7">
       <div className="flex items-center justify-between mb-1">
-        <div className="font-news text-[15px]" style={{ fontStyle: "italic" }}>
-          → Open new stream
-        </div>
-        <span className="pill pill-live">
-          <span className="dot dot-stream"></span> live
+        <div className="font-display italic text-2xl text-paper">Open Patronage</div>
+        <span className="stamp stamp-indigo">
+          <span className="dot dot-stream" /> live
         </span>
       </div>
-      <div
-        className="text-[11px] mb-5 font-mono"
-        style={{ color: "var(--muted)" }}
-      >
+      <div className="text-[11px] mb-6 font-mono uppercase tracking-[0.14em] text-paper-mute">
         Sender pays in WOPN. Recipient withdraws continuously.
       </div>
 
@@ -139,7 +121,7 @@ function OpenStream() {
         />
       </Field>
 
-      <div className="grid grid-cols-2 gap-3 mt-3">
+      <div className="grid grid-cols-2 gap-3 mt-4">
         <Field label="deposit · OPN">
           <input
             className="ink-input"
@@ -158,39 +140,21 @@ function OpenStream() {
         </Field>
       </div>
 
-      <div
-        className="mt-4 mb-4 p-3 rounded-md"
-        style={{
-          background: "rgba(0, 0, 0, 0.3)",
-          border: "1px solid var(--border)",
-        }}
-      >
-        <div
-          className="text-[9px] font-mono uppercase"
-          style={{ color: "var(--muted)", letterSpacing: "0.2em" }}
-        >
-          duration estimate
-        </div>
-        <div className="font-mono mt-0.5">
-          {durationDays.toFixed(2)} days @ this rate
+      <div className="mt-5 mb-5 surface-raised p-4">
+        <div className="label-engraved">duration estimate</div>
+        <div className="font-display text-2xl mt-1 text-brass">
+          {durationDays.toFixed(2)}
+          <span className="text-sm ml-2 text-paper-mute font-mono">days at this rate</span>
         </div>
       </div>
 
       <div className="flex flex-col gap-2">
-        <button
-          className="btn btn-ghost text-[11px]"
-          onClick={wrap}
-          disabled={isPending}
-        >
-          1 · Wrap {deposit} OPN
+        <button className="btn btn-ghost" onClick={wrap} disabled={isPending}>
+          i · Wrap {deposit} OPN
         </button>
         {needsApproval && (
-          <button
-            className="btn btn-ghost text-[11px]"
-            onClick={approve}
-            disabled={isPending}
-          >
-            2 · Approve InkStream
+          <button className="btn btn-ghost" onClick={approve} disabled={isPending}>
+            ii · Approve InkStream
           </button>
         )}
         <button
@@ -198,7 +162,7 @@ function OpenStream() {
           disabled={isPending || isConfirming || !recipient || needsApproval}
           onClick={open}
         >
-          {needsApproval ? "Approve to enable" : "Open stream →"}
+          {needsApproval ? "Approve to enable" : "Open patronage →"}
         </button>
       </div>
       <TxStatus
@@ -238,11 +202,8 @@ function ManageStream() {
     query: { enabled: id > 0n, refetchInterval: 1000 },
   });
 
-  const { writeContractAsync, data: hash, isPending, error, reset } =
-    useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash,
-  });
+  const { writeContractAsync, data: hash, isPending, error, reset } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
   useEffect(() => {
     if (isSuccess) {
       refetchStream();
@@ -267,20 +228,15 @@ function ManageStream() {
   const empty = !s || s[0] === "0x0000000000000000000000000000000000000000";
 
   return (
-    <div className="panel">
+    <div className="surface p-7">
       <div className="flex items-center justify-between mb-1">
-        <div className="font-news text-[15px]" style={{ fontStyle: "italic" }}>
-          ⤺ Manage stream
-        </div>
+        <div className="font-display italic text-2xl text-paper">Manage Patronage</div>
       </div>
-      <div
-        className="text-[11px] mb-5 font-mono"
-        style={{ color: "var(--muted)" }}
-      >
-        Withdraw or cancel an existing stream by ID.
+      <div className="text-[11px] mb-6 font-mono uppercase tracking-[0.14em] text-paper-mute">
+        Withdraw or revoke an existing patronage by ID.
       </div>
 
-      <Field label="stream id">
+      <Field label="patronage id">
         <input
           className="ink-input"
           type="number"
@@ -291,19 +247,13 @@ function ManageStream() {
       </Field>
 
       {empty ? (
-        <div
-          className="mt-5 text-sm py-6 text-center rounded-md"
-          style={{
-            color: "var(--muted)",
-            border: "1px dashed var(--border)",
-          }}
-        >
-          No stream with ID {streamId}.
+        <div className="mt-6 text-sm py-8 text-center rounded-sm border border-dashed border-rule text-paper-mute font-display italic">
+          No patronage with ID {streamId}.
           <br />
-          New streams are numbered sequentially from 1.
+          New patronages are numbered sequentially from 1.
         </div>
       ) : (
-        <div className="space-y-2 mt-5 text-sm">
+        <div className="space-y-2 mt-6 text-sm">
           <Row label="sender" value={shortAddr(s![0])} />
           <Row label="recipient" value={shortAddr(s![1])} />
           <Row label="deposited" value={`${fmt(s![2], 4)} WOPN`} />
@@ -313,40 +263,18 @@ function ManageStream() {
             label="status"
             value={
               s![6] === 0n ? (
-                <span style={{ color: "var(--yield)" }}>● active</span>
+                <span className="text-verdigris-bright">● active</span>
               ) : (
-                <span style={{ color: "var(--muted)" }}>○ stopped</span>
+                <span className="text-paper-mute">○ revoked</span>
               )
             }
           />
-          <div
-            className="pt-3 mt-3"
-            style={{ borderTop: "1px solid var(--border)" }}
-          >
-            <div
-              className="p-3 rounded-md mb-2"
-              style={{
-                background: "rgba(14, 165, 233, 0.08)",
-                border: "1px solid rgba(14, 165, 233, 0.25)",
-              }}
-            >
-              <div
-                className="text-[9px] font-mono uppercase"
-                style={{ color: "var(--stream)", letterSpacing: "0.2em" }}
-              >
-                withdrawable now
-              </div>
-              <div
-                className="font-serif text-[24px] mt-0.5"
-                style={{ color: "var(--stream)" }}
-              >
+          <div className="pt-4 mt-4 border-t border-rule">
+            <div className="surface-raised p-4 mb-3">
+              <div className="label-engraved">withdrawable now</div>
+              <div className="font-display text-[32px] mt-1 text-brass-bright leading-none">
                 {fmt(withdrawable as bigint | undefined, 6)}
-                <span
-                  className="text-xs ml-1 font-mono"
-                  style={{ color: "var(--muted)" }}
-                >
-                  WOPN
-                </span>
+                <span className="text-sm ml-2 text-paper-mute font-mono">WOPN</span>
               </div>
             </div>
             <Row
@@ -354,7 +282,7 @@ function ManageStream() {
               value={`${fmt(remaining as bigint | undefined, 4)} WOPN`}
             />
           </div>
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2 mt-5">
             <button
               className="btn btn-primary flex-1 justify-center"
               onClick={() =>
@@ -383,7 +311,7 @@ function ManageStream() {
               }
               disabled={isPending || isConfirming}
             >
-              Cancel
+              Revoke
             </button>
           </div>
           <TxStatus
@@ -399,44 +327,20 @@ function ManageStream() {
   );
 }
 
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label
-        className="text-[10px] uppercase font-mono block mb-1"
-        style={{ color: "var(--muted)", letterSpacing: "0.2em" }}
-      >
-        {label}
-      </label>
+      <label className="label-engraved block mb-1.5">{label}</label>
       {children}
     </div>
   );
 }
 
-function Row({
-  label,
-  value,
-}: {
-  label: string;
-  value: React.ReactNode;
-}) {
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex justify-between items-center text-sm py-0.5">
-      <span
-        className="text-[11px] uppercase font-mono"
-        style={{ color: "var(--muted)", letterSpacing: "0.15em" }}
-      >
-        {label}
-      </span>
-      <span className="font-mono" style={{ color: "var(--paper)" }}>
-        {value}
-      </span>
+    <div className="flex justify-between items-center text-sm py-1">
+      <span className="label-engraved">{label}</span>
+      <span className="font-mono text-paper">{value}</span>
     </div>
   );
 }

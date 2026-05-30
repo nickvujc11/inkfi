@@ -6,7 +6,7 @@ import { useAccount, useReadContract } from "wagmi";
 import Logo from "./Logo";
 import { ADDR } from "@/lib/addresses";
 import { articleNftAbi } from "@/lib/abis";
-import { fmt, shortAddr } from "@/lib/format";
+import { shortAddr } from "@/lib/format";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -20,45 +20,41 @@ export default function Sidebar() {
   });
   const total = nextId ? Number(nextId) : 0;
 
-  const sections = [
+  const sections: {
+    label: string;
+    items: { href: string; icon: string; text: string; badge?: string }[];
+  }[] = [
     {
-      label: "Overview",
+      label: "Reading Room",
       items: [
-        { href: "/", icon: "◈", text: "Articles" },
-        { href: "/dashboard", icon: "▦", text: "Dashboard" },
-        { href: "/streams", icon: "∞", text: "Streams", badge: "live" },
+        { href: "/", icon: "❦", text: "Articles" },
+        { href: "/streams", icon: "∮", text: "Streams" },
       ],
     },
     {
-      label: "Build",
+      label: "Atelier",
       items: [
-        { href: "/write", icon: "✍", text: "Write" },
+        { href: "/dashboard", icon: "✦", text: "Dashboard" },
+        { href: "/write", icon: "✎", text: "Write" },
       ],
     },
   ];
 
   return (
-    <aside
-      className="hidden lg:flex flex-col w-[240px] flex-shrink-0 border-r"
-      style={{ borderColor: "var(--border)", background: "rgba(0,0,0,0.2)" }}
-    >
-      <div className="px-5 py-6">
+    <aside className="hidden lg:flex flex-col w-[240px] flex-shrink-0 border-r border-rule bg-walnut-deep/40">
+      <div className="px-5 py-7">
         <Logo tagline />
       </div>
 
-      <div
-        className="h-px mx-5"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, var(--gold), transparent)",
-          opacity: 0.3,
-        }}
-      />
+      {/* engraved divider */}
+      <div className="px-5">
+        <div className="rule"><span className="rule-dot" /></div>
+      </div>
 
       <nav className="flex-1 py-6 overflow-y-auto">
         {sections.map((sec) => (
-          <div key={sec.label} className="mb-7 px-5">
-            <div className="nav-section-label">{sec.label}</div>
+          <div key={sec.label} className="mb-7 px-4">
+            <div className="label-engraved px-3 mb-2.5">{sec.label}</div>
             {sec.items.map((it) => {
               const active =
                 pathname === it.href ||
@@ -67,90 +63,69 @@ export default function Sidebar() {
                 <Link
                   key={it.href}
                   href={it.href}
-                  className={`nav-item ${active ? "active" : ""}`}
+                  className={`shelf-link ${active ? "active" : ""}`}
                 >
-                  <span className="text-base opacity-70">{it.icon}</span>
-                  <span>{it.text}</span>
-                  {it.badge === "live" && (
-                    <span
-                      className="nav-badge"
-                      style={{
-                        background: "rgba(16,185,129,0.15)",
-                        color: "var(--yield)",
-                        border: "1px solid rgba(16,185,129,0.2)",
-                      }}
-                    >
-                      live
-                    </span>
-                  )}
+                  <span className="text-base text-brass/70 w-4 text-center">
+                    {it.icon}
+                  </span>
+                  <span className="font-display text-[15px]">{it.text}</span>
                 </Link>
               );
             })}
           </div>
         ))}
 
-        {/* writer card */}
-        <div className="mx-5 mb-5">
-          <div
-            className="p-4 rounded-xl"
-            style={{
-              background: "var(--surface)",
-              border: "1px solid var(--border)",
-            }}
-          >
+        {/* Reader card / wallet card */}
+        <div className="mx-4 mt-8">
+          <div className="surface p-4">
             {isConnected && address ? (
               <>
-                <div
-                  className="w-9 h-9 rounded-full flex items-center justify-center mb-2 font-serif text-[15px] text-white"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, var(--accent), var(--gold))",
-                  }}
-                >
-                  {address.slice(2, 3).toUpperCase()}
+                <div className="flex items-center gap-3 mb-3">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center font-display text-[18px] text-paper border border-brass-edge"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #b08d57 0%, #2a3a5e 100%)",
+                    }}
+                  >
+                    {address.slice(2, 3).toUpperCase()}
+                  </div>
+                  <div className="leading-tight">
+                    <div className="font-display text-sm text-paper">
+                      Member
+                    </div>
+                    <div className="font-mono text-[10px] text-paper-mute">
+                      {shortAddr(address)}
+                    </div>
+                  </div>
                 </div>
-                <div className="font-news text-[14px]">
-                  {shortAddr(address)}
-                </div>
-                <div
-                  className="text-[10px] mt-0.5 font-mono"
-                  style={{ color: "var(--muted)", letterSpacing: "0.05em" }}
-                >
-                  on OPN Chain
+                <div className="rule mb-3"><span className="rule-dot" /></div>
+                <div className="font-mono text-[9px] uppercase tracking-[0.22em] text-paper-mute text-center">
+                  reading membership · active
                 </div>
               </>
             ) : (
-              <div
-                className="text-xs text-center py-2"
-                style={{ color: "var(--muted)" }}
-              >
-                Connect wallet to begin
+              <div className="text-center py-2">
+                <div className="font-display text-sm text-paper italic mb-1">
+                  Become a member
+                </div>
+                <div className="text-[11px] text-paper-mute">
+                  Connect to begin
+                </div>
               </div>
             )}
           </div>
         </div>
       </nav>
 
-      <div className="p-5 border-t" style={{ borderColor: "var(--border)" }}>
+      <div className="p-5 border-t border-rule">
         <div className="flex items-center justify-between text-[10px]">
-          <div
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full font-mono"
-            style={{
-              background: "var(--surface)",
-              border: "1px solid var(--border)",
-              color: "var(--muted)",
-              letterSpacing: "0.1em",
-            }}
-          >
-            <span className="dot dot-live"></span>
-            OPN · 984
-          </div>
-          <div
-            className="font-mono"
-            style={{ color: "var(--muted)", letterSpacing: "0.1em" }}
-          >
-            {total} articles
-          </div>
+          <span className="stamp stamp-verdigris">
+            <span className="dot dot-live" /> OPN · 984
+          </span>
+          <span className="font-mono text-paper-mute uppercase tracking-[0.18em]">
+            vol. {total.toString().padStart(3, "0")}
+          </span>
         </div>
       </div>
     </aside>

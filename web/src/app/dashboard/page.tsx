@@ -11,7 +11,7 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 import { ADDR } from "@/lib/addresses";
-import { articleNftAbi, vaultAbi, wopnAbi } from "@/lib/abis";
+import { articleNftAbi, vaultAbi } from "@/lib/abis";
 import { fmt, shortAddr } from "@/lib/format";
 import { loadArticles } from "@/lib/articles";
 
@@ -28,7 +28,6 @@ export default function DashboardPage() {
   const total = nextId ? Number(nextId) : 0;
   const ids = Array.from({ length: total }, (_, i) => i + 1);
 
-  // Per-article: writer, totalStaked, my pending, my stake
   const articleReads = useReadContracts({
     contracts: ids.flatMap((id) => [
       {
@@ -117,117 +116,95 @@ export default function DashboardPage() {
   const myStakedArticles = address
     ? rows.filter((r) => r.myStaked > 0n)
     : [];
-
   const totalProtocolTvl = rows.reduce((s, r) => s + r.totalStaked, 0n);
   const myTotalStake = myStakedArticles.reduce((s, r) => s + r.myStaked, 0n);
   const myTotalPending = myStakedArticles.reduce((s, r) => s + r.myPending, 0n);
   const myArticlesTvl = myArticles.reduce((s, r) => s + r.totalStaked, 0n);
 
-  // wallet balances
-  const { data: nativeBal } = useReadContract({
-    address: ADDR.WOPN,
-    abi: wopnAbi,
-    functionName: "balanceOf",
-    args: address ? [address] : undefined,
-    query: { enabled: !!address, refetchInterval: 5000 },
-  });
-
   return (
-    <div className="space-y-8">
-      {/* page header */}
-      <div className="flex items-start justify-between flex-wrap gap-4">
+    <div className="space-y-12">
+      <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="font-serif text-[32px] leading-none">
-            Writer <em style={{ color: "var(--gold)" }}>Dashboard</em>
+          <div className="label-engraved mb-3">Member Ledger</div>
+          <h1 className="font-display text-[60px] leading-[0.95] text-paper">
+            The <em className="text-brass">Reading Room</em>
           </h1>
-          <p
-            className="mt-2 text-[12px] font-mono"
-            style={{ color: "var(--muted)", letterSpacing: "0.05em" }}
-          >
-            Season 1 · OPN Testnet
-            {block ? ` · Block #${Number(block).toLocaleString()}` : ""}
+          <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.28em] text-paper-mute">
+            Season I · OPN Testnet
+            {block ? ` · Block № ${Number(block).toLocaleString()}` : ""}
           </p>
         </div>
         <div className="flex gap-2">
           <Link href="/" className="btn btn-ghost">
-            View on Chain
+            ❦ Browse Archive
           </Link>
           <Link href="/write" className="btn btn-primary">
-            ✍ New Article
+            ✎ Compose Volume
           </Link>
         </div>
       </div>
 
       {!isConnected && (
-        <div className="panel text-center py-16">
-          <div className="text-5xl mb-4">⬡</div>
-          <div
-            className="font-news text-xl mb-2"
-            style={{ fontStyle: "italic" }}
-          >
+        <div className="surface text-center py-20">
+          <div className="text-7xl mb-5 text-brass">❧</div>
+          <div className="font-display italic text-3xl mb-2">
             Connect your wallet
           </div>
-          <p
-            className="text-sm mb-6 max-w-md mx-auto"
-            style={{ color: "var(--muted)" }}
-          >
-            Your dashboard surfaces articles you wrote, vaults you staked on,
-            and pending rewards across the protocol.
+          <p className="text-paper-mute mb-8 max-w-md mx-auto">
+            Your reading room surfaces volumes you wrote, vaults you endorsed,
+            and yield ready to claim — directly from on-chain reads.
           </p>
         </div>
       )}
 
       {isConnected && (
         <>
-          {/* STATS */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-up">
-            <Stat
-              kind="gold"
-              icon="◎"
-              value={fmt(myTotalPending, 4)}
-              label="Pending Rewards"
-              note="OPN claimable"
-            />
-            <Stat
-              kind="yield"
-              icon="⬡"
-              value={fmt(myTotalStake, 4)}
-              label="My Stake (TVL)"
-              note={`across ${myStakedArticles.length} vault${myStakedArticles.length === 1 ? "" : "s"}`}
-            />
-            <Stat
-              kind="stream"
-              icon="✍"
-              value={myArticles.length.toString()}
-              label="My Articles"
-              note={`${fmt(myArticlesTvl, 2)} OPN staked on you`}
-            />
-            <Stat
-              kind="purple"
-              icon="◈"
-              value={fmt(totalProtocolTvl, 2)}
-              label="Protocol TVL"
-              note={`${total} articles total`}
-            />
-          </div>
+          {/* Member ledger */}
+          <section>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-up">
+              <Stat
+                kind="brass"
+                value={fmt(myTotalPending, 4)}
+                label="Pending Yield"
+                note="OPN claimable"
+              />
+              <Stat
+                kind="verdigris"
+                value={fmt(myTotalStake, 4)}
+                label="Endowed Capital"
+                note={`across ${myStakedArticles.length} ${myStakedArticles.length === 1 ? "vault" : "vaults"}`}
+              />
+              <Stat
+                kind="indigo"
+                value={myArticles.length.toString()}
+                label="Volumes Authored"
+                note={`${fmt(myArticlesTvl, 2)} OPN endowed`}
+              />
+              <Stat
+                kind="brass"
+                value={fmt(totalProtocolTvl, 2)}
+                label="Archive TVL"
+                note={`${total} volumes total`}
+              />
+            </div>
+          </section>
 
-          {/* MY VAULTS */}
-          <Section
-            title="Vaults you stake on"
-            tag={
-              <span className="pill pill-yield">
-                <span className="dot dot-live"></span>
-                {myStakedArticles.length} active
+          {/* Endorsements */}
+          <section>
+            <div className="section-mast">
+              <span className="num">i.</span>
+              <span className="label">Endorsements</span>
+              <span className="meta">
+                {myStakedArticles.length} vault{myStakedArticles.length === 1 ? "" : "s"}
               </span>
-            }
-          >
+            </div>
             {myStakedArticles.length === 0 ? (
               <Empty
-                title="No active stakes."
-                body="Pick an article from the feed and stake OPN to start earning."
+                title="No endorsements yet."
+                body="Pick a volume from the archive and stake OPN to begin earning yield."
                 cta={
                   <Link href="/" className="btn btn-primary">
-                    Browse articles
+                    ❦ Browse archive
                   </Link>
                 }
               />
@@ -238,24 +215,22 @@ export default function DashboardPage() {
                 ))}
               </div>
             )}
-          </Section>
+          </section>
 
-          {/* MY ARTICLES */}
-          <Section
-            title="Articles you wrote"
-            tag={
-              <span className="pill pill-gold">
-                {myArticles.length} published
-              </span>
-            }
-          >
+          {/* Authored volumes */}
+          <section>
+            <div className="section-mast">
+              <span className="num">ii.</span>
+              <span className="label">Authored Volumes</span>
+              <span className="meta">{myArticles.length} published</span>
+            </div>
             {myArticles.length === 0 ? (
               <Empty
-                title="You haven't published yet."
-                body="Mint your first article NFT — it's soulbound to your wallet."
+                title="No authored volumes."
+                body="Inscribe your first volume — it becomes a soulbound NFT in your wallet."
                 cta={
                   <Link href="/write" className="btn btn-primary">
-                    ✍ Write something
+                    ✎ Compose
                   </Link>
                 }
               />
@@ -266,7 +241,7 @@ export default function DashboardPage() {
                 ))}
               </div>
             )}
-          </Section>
+          </section>
         </>
       )}
     </div>
@@ -275,71 +250,33 @@ export default function DashboardPage() {
 
 function Stat({
   kind,
-  icon,
   value,
   label,
   note,
 }: {
-  kind: "gold" | "stream" | "yield" | "purple";
-  icon: string;
+  kind: "brass" | "verdigris" | "indigo" | "stamp";
   value: string;
   label: string;
   note?: string;
 }) {
-  const noteColor = {
-    gold: "var(--gold-light)",
-    stream: "var(--stream)",
-    yield: "var(--yield)",
-    purple: "#c084fc",
-  }[kind];
+  const colors = {
+    brass: "text-brass-bright",
+    verdigris: "text-verdigris-bright",
+    indigo: "text-ink-indigo-bright",
+    stamp: "text-stamp-bright",
+  };
   return (
-    <div className={`stat-card ${kind}`}>
-      <div className="text-[18px] mb-3 opacity-80">{icon}</div>
-      <div className="font-serif text-[26px] leading-none">{value}</div>
-      <div
-        className="text-[10px] uppercase mt-1.5 font-mono"
-        style={{ color: "var(--muted)", letterSpacing: "0.2em" }}
-      >
-        {label}
+    <div className="stat-tile">
+      <div className="label-engraved">{label}</div>
+      <div className={`mt-2 font-display text-[34px] leading-none font-semibold ${colors[kind]}`}>
+        {value}
       </div>
       {note && (
-        <div
-          className="text-[11px] mt-2.5 font-mono"
-          style={{ color: noteColor, letterSpacing: "0.05em" }}
-        >
+        <div className="mt-3 text-[10px] font-mono uppercase tracking-[0.18em] text-paper-mute">
           {note}
         </div>
       )}
     </div>
-  );
-}
-
-function Section({
-  title,
-  tag,
-  children,
-}: {
-  title: string;
-  tag?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <section>
-      <div className="flex items-center gap-4 mb-4">
-        <div
-          className="text-[10px] font-mono uppercase whitespace-nowrap"
-          style={{ color: "var(--muted)", letterSpacing: "0.3em" }}
-        >
-          {title}
-        </div>
-        <div
-          className="flex-1 h-px"
-          style={{ background: "var(--border)" }}
-        ></div>
-        {tag}
-      </div>
-      {children}
-    </section>
   );
 }
 
@@ -353,16 +290,9 @@ function Empty({
   cta?: React.ReactNode;
 }) {
   return (
-    <div className="panel text-center py-12">
-      <div className="font-news text-lg mb-2" style={{ fontStyle: "italic" }}>
-        {title}
-      </div>
-      <p
-        className="text-sm mb-5 max-w-md mx-auto"
-        style={{ color: "var(--muted)" }}
-      >
-        {body}
-      </p>
+    <div className="surface text-center py-14">
+      <div className="font-display italic text-2xl mb-2">{title}</div>
+      <p className="text-paper-mute mb-6 max-w-md mx-auto">{body}</p>
       {cta}
     </div>
   );
@@ -381,8 +311,7 @@ function VaultCard({
 }) {
   const [local, setLocal] = useState<{ title: string } | null>(null);
   useEffect(() => {
-    const all = loadArticles();
-    setLocal(all[row.id] ?? null);
+    setLocal(loadArticles()[row.id] ?? null);
   }, [row.id]);
 
   const { writeContractAsync, data: hash, isPending } = useWriteContract();
@@ -406,64 +335,45 @@ function VaultCard({
       : 0;
 
   return (
-    <div
-      className="panel-soft p-5 transition hover:translate-y-[-2px]"
-      style={{ position: "relative" }}
-    >
+    <div className="surface p-5 transition hover:bg-walnut-warm relative">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="pill pill-mute font-mono">#{row.id}</span>
-          <span className="pill pill-gold">
-            <span className="dot dot-gold"></span> staked
+          <span className="stamp stamp-mute">№ {String(row.id).padStart(3, "0")}</span>
+          <span className="stamp stamp-brass">
+            <span className="dot dot-brass" /> endorsed
           </span>
         </div>
         <Link
           href={`/article/${row.id}`}
-          className="text-[11px] font-mono"
-          style={{ color: "var(--muted)" }}
+          className="text-[10px] font-mono uppercase tracking-[0.2em] text-paper-mute hover:text-brass"
         >
           open →
         </Link>
       </div>
-      <div
-        className="font-news text-[15px] leading-snug mb-4 line-clamp-2"
-        style={{ fontStyle: "italic", color: "var(--paper)" }}
-      >
-        {local?.title ?? `Article by ${shortAddr(row.writer)}`}
+      <div className="font-display italic text-[18px] leading-snug mb-4 text-paper line-clamp-2">
+        {local?.title ?? `Volume by ${shortAddr(row.writer)}`}
       </div>
 
       <div className="grid grid-cols-3 gap-2 mb-4">
-        <Metric label="My stake" value={fmt(row.myStaked, 3)} accent="gold" />
-        <Metric
-          label="Pool TVL"
-          value={fmt(row.totalStaked, 2)}
-          accent="stream"
-        />
-        <Metric label="Share" value={`${sharePct.toFixed(1)}%`} accent="yield" />
+        <Metric label="My stake" value={fmt(row.myStaked, 3)} accent="brass" />
+        <Metric label="Pool TVL" value={fmt(row.totalStaked, 2)} accent="indigo" />
+        <Metric label="Share" value={`${sharePct.toFixed(1)}%`} accent="verdigris" />
       </div>
 
-      <div
-        className="p-3 rounded-lg mb-3"
-        style={{
-          background: "rgba(201, 168, 76, 0.08)",
-          border: "1px solid rgba(201, 168, 76, 0.2)",
-        }}
-      >
-        <div
-          className="text-[9px] font-mono uppercase mb-1"
-          style={{ color: "var(--gold)", letterSpacing: "0.2em" }}
-        >
-          Pending Reward
-        </div>
-        <div
-          className="font-serif text-xl"
-          style={{ color: "var(--gold-light)" }}
-        >
+      <div className="surface-raised p-3 mb-3 relative">
+        <div className="label-engraved">pending yield</div>
+        <div className="font-display text-2xl mt-1 leading-none text-brass-bright font-semibold">
           {fmt(row.myPending, 6)}
-          <span className="text-xs ml-1" style={{ color: "var(--muted)" }}>
-            OPN
-          </span>
+          <span className="text-xs ml-1.5 text-paper-mute font-mono">OPN</span>
         </div>
+        {row.myPending > 0n && (
+          <span
+            className="absolute -top-2 -right-2 stamp stamp-stamp stamp-tilt"
+            style={{ transform: "rotate(7deg)" }}
+          >
+            CLAIM
+          </span>
+        )}
       </div>
 
       <button
@@ -474,7 +384,7 @@ function VaultCard({
         {isConfirming
           ? "Claiming…"
           : isPending
-            ? "Awaiting wallet…"
+            ? "Awaiting…"
             : isSuccess
               ? "✓ Claimed"
               : `Claim ${fmt(row.myPending, 4)}`}
@@ -493,49 +403,40 @@ function ArticleOwnCard({
     totalStaked: bigint;
   };
 }) {
-  const [local, setLocal] = useState<{ title: string; body?: string } | null>(
-    null
-  );
+  const [local, setLocal] = useState<{ title: string } | null>(null);
   useEffect(() => {
-    const all = loadArticles();
-    setLocal(all[row.id] ?? null);
+    setLocal(loadArticles()[row.id] ?? null);
   }, [row.id]);
 
   return (
     <Link href={`/article/${row.id}`}>
-      <div
-        className="panel-soft p-5 transition hover:translate-y-[-2px] h-full"
-        style={{ cursor: "pointer" }}
-      >
+      <div className="surface p-5 hover:bg-walnut-warm cursor-pointer h-full transition">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span className="pill pill-mute font-mono">#{row.id}</span>
-            <span className="pill pill-mute">v{row.version}</span>
+            <span className="stamp stamp-mute">№ {String(row.id).padStart(3, "0")}</span>
+            <span className="stamp stamp-mute">v{row.version}</span>
           </div>
-          <span className="text-[10px] font-mono" style={{ color: "var(--muted)" }}>
-            {new Date(Number(row.createdAt) * 1000).toLocaleDateString(
-              undefined,
-              { month: "short", day: "numeric" }
-            )}
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-paper-mute">
+            {new Date(Number(row.createdAt) * 1000).toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+            })}
           </span>
         </div>
-        <div
-          className="font-news text-[16px] leading-snug mb-4 line-clamp-2"
-          style={{ fontStyle: "italic", color: "var(--paper)" }}
-        >
+        <div className="font-display italic text-[20px] leading-snug mb-4 text-paper line-clamp-2">
           {local?.title ?? "(off-chain title not in cache)"}
         </div>
 
         <div className="grid grid-cols-2 gap-2">
           <Metric
-            label="Staked on you"
+            label="Endowed on you"
             value={`${fmt(row.totalStaked, 2)} OPN`}
-            accent="gold"
+            accent="brass"
           />
           <Metric
             label="Status"
-            value={row.totalStaked > 0n ? "Live · Earning" : "Awaiting stake"}
-            accent={row.totalStaked > 0n ? "yield" : "muted"}
+            value={row.totalStaked > 0n ? "Live · Earning" : "Awaiting endow"}
+            accent={row.totalStaked > 0n ? "verdigris" : "mute"}
           />
         </div>
       </div>
@@ -546,33 +447,24 @@ function ArticleOwnCard({
 function Metric({
   label,
   value,
-  accent = "gold",
+  accent = "brass",
 }: {
   label: string;
   value: string;
-  accent?: "gold" | "stream" | "yield" | "muted";
+  accent?: "brass" | "indigo" | "verdigris" | "mute";
 }) {
   const colors = {
-    gold: "var(--gold-light)",
-    stream: "var(--stream)",
-    yield: "var(--yield)",
-    muted: "var(--muted)",
+    brass: "text-brass-bright",
+    indigo: "text-ink-indigo-bright",
+    verdigris: "text-verdigris-bright",
+    mute: "text-paper-mute",
   };
   return (
-    <div
-      className="p-2 rounded-md text-center"
-      style={{ background: "rgba(0, 0, 0, 0.25)" }}
-    >
-      <div
-        className="font-mono text-[13px] font-medium"
-        style={{ color: colors[accent] }}
-      >
+    <div className="bg-walnut-deep border border-rule rounded-sm p-2 text-center">
+      <div className={`font-mono text-[13px] font-medium ${colors[accent]}`}>
         {value}
       </div>
-      <div
-        className="text-[9px] font-mono uppercase mt-0.5"
-        style={{ color: "var(--muted)", letterSpacing: "0.12em" }}
-      >
+      <div className="text-[9px] font-mono uppercase tracking-[0.18em] text-paper-mute mt-0.5">
         {label}
       </div>
     </div>

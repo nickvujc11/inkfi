@@ -36,118 +36,84 @@ export default function Home() {
   }
 
   return (
-    <div className="space-y-10">
-      {/* HERO */}
-      <section className="text-center py-12">
-        <div
-          className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full"
-          style={{
-            background: "var(--surface)",
-            border: "1px solid var(--border)",
-          }}
-        >
-          <span className="dot dot-live"></span>
-          <span
-            className="text-[10px] font-mono uppercase"
-            style={{ color: "var(--muted)", letterSpacing: "0.25em" }}
-          >
-            live · OPN testnet · season 1
-          </span>
-        </div>
-        <h1
-          className="font-serif text-5xl md:text-7xl leading-[0.95] tracking-tight"
-          style={{ color: "var(--paper)" }}
-        >
-          Write Once.
-          <br />
-          <em style={{ color: "var(--gold)", fontStyle: "italic" }}>
-            Earn Forever.
-          </em>
-        </h1>
-        <p
-          className="mt-6 max-w-xl mx-auto leading-relaxed font-news"
-          style={{ color: "rgba(244, 240, 232, 0.7)", fontStyle: "italic" }}
-        >
-          Decentralized publishing where every article is a yield-bearing
-          asset. Tip, stake, and stream OPN — fully on-chain.
-        </p>
-        <div className="mt-8 flex gap-2 justify-center flex-wrap">
-          <Link href="/write" className="btn btn-primary">
-            ✍ Start Writing
-          </Link>
-          <Link href="#feed" className="btn btn-ghost">
-            Explore Articles ↓
-          </Link>
-        </div>
-      </section>
+    <div className="space-y-16">
+      {/* HERO — masthead */}
+      <section className="relative pt-8">
+        <div className="text-center">
+          <div className="label-engraved mb-6">No. I · Vol. {total.toString().padStart(2, "0")}</div>
 
-      {/* live stats strip */}
-      <section className="grid grid-cols-3 gap-3 max-w-3xl mx-auto">
-        <Stat label="Articles" value={total.toString()} />
-        <Stat label="Protocol TVL" value={`${fmt(totalTvl, 2)} OPN`} accent />
-        <Stat label="Chain ID" value="984" mono />
-      </section>
+          <h1 className="font-display text-[80px] md:text-[120px] leading-[0.88] tracking-tighter text-paper">
+            Write Once.
+            <br />
+            <em className="text-brass italic font-medium">Earn Forever.</em>
+          </h1>
 
-      {/* WHY */}
-      <section
-        className="py-10 border-t border-b"
-        style={{ borderColor: "var(--border)" }}
-      >
-        <div className="text-center mb-10">
-          <div
-            className="text-[10px] font-mono uppercase mb-3"
-            style={{ color: "var(--muted)", letterSpacing: "0.3em" }}
-          >
-            why inkfi
+          <div className="rule max-w-md mx-auto mt-8">
+            <span className="rule-dot" />
           </div>
-          <h2 className="font-serif text-3xl md:text-4xl">
-            Three primitives.{" "}
-            <em style={{ color: "var(--gold)", fontStyle: "italic" }}>
-              One story.
-            </em>
-          </h2>
+
+          <p className="mt-6 max-w-xl mx-auto font-display italic text-[20px] leading-relaxed text-paper-dim">
+            An archive where every article becomes a yield-bearing volume.
+            <br />
+            Tip, stake, and stream <span className="text-brass">OPN</span> to writers — fully on-chain.
+          </p>
+
+          <div className="mt-10 flex gap-3 justify-center flex-wrap">
+            <Link href="/write" className="btn btn-primary">
+              ✎ Compose
+            </Link>
+            <Link href="#archive" className="btn btn-ghost">
+              ❦ Browse Archive
+            </Link>
+          </div>
         </div>
-        <div className="grid md:grid-cols-3 gap-4">
+      </section>
+
+      {/* Live ledger strip */}
+      <section className="grid grid-cols-3 gap-0 border-t border-b border-rule divide-x divide-rule">
+        <Ledger label="Volumes" value={total.toString()} sub="published on-chain" />
+        <Ledger label="Capital at rest" value={`${fmt(totalTvl, 2)}`} unit="OPN" sub="across all vaults" emphasis />
+        <Ledger label="Network" value="OPN · 984" sub="testnet · live" mono />
+      </section>
+
+      {/* THREE PRIMITIVES */}
+      <section>
+        <div className="section-mast">
+          <span className="num">I.</span>
+          <span className="label">Three Primitives</span>
+          <span className="meta">on-chain · soulbound</span>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-px bg-rule">
           {[
             {
-              num: "01",
-              icon: "✍",
-              title: "Write",
-              body: "Distraction-free editor. Publish to OPN Chain. Each article becomes a soulbound NFT proving immutable authorship.",
+              num: "i",
+              icon: "✎",
+              title: "Inscribe",
+              body: "Compose. Mint a soulbound NFT. Authorship is etched into OPN Chain, immutable and permanent.",
             },
             {
-              num: "02",
-              icon: "◈",
-              title: "Stake",
-              body: "Fans deposit OPN on articles they believe in. When the article gets tipped, stakers earn yield pro-rata.",
+              num: "ii",
+              icon: "❦",
+              title: "Endorse",
+              body: "Stake OPN on writing you believe in. When tips arrive, stakers earn pro-rata yield.",
             },
             {
-              num: "03",
-              icon: "∞",
-              title: "Stream",
-              body: "Subscribers stream OPN to writers per second. Continuous income, made viable by OPN's sub-second finality.",
+              num: "iii",
+              icon: "∮",
+              title: "Patronise",
+              body: "Subscribe per-second to a writer. OPN flows continuously, made viable by sub-second finality.",
             },
           ].map((f) => (
-            <div key={f.num} className="panel">
-              <div className="flex items-baseline justify-between mb-3">
-                <div className="text-3xl">{f.icon}</div>
-                <div
-                  className="font-mono text-xs"
-                  style={{ color: "var(--muted)" }}
-                >
-                  {f.num}
-                </div>
+            <div key={f.num} className="bg-walnut p-7 hover:bg-walnut-mid transition-colors duration-300">
+              <div className="flex items-baseline justify-between mb-5">
+                <div className="text-3xl text-brass">{f.icon}</div>
+                <div className="font-display italic text-brass text-2xl">{f.num}</div>
               </div>
-              <div
-                className="font-news text-xl mb-2"
-                style={{ fontStyle: "italic" }}
-              >
+              <div className="font-display text-[28px] font-semibold mb-2 text-paper">
                 {f.title}
               </div>
-              <div
-                className="text-sm leading-relaxed"
-                style={{ color: "rgba(244, 240, 232, 0.65)" }}
-              >
+              <div className="text-paper-mute text-[14px] leading-relaxed">
                 {f.body}
               </div>
             </div>
@@ -155,48 +121,27 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FEED */}
-      <section id="feed">
-        <div className="flex items-center gap-4 mb-6">
-          <div
-            className="text-[10px] font-mono uppercase whitespace-nowrap"
-            style={{ color: "var(--muted)", letterSpacing: "0.3em" }}
-          >
-            Latest articles
-          </div>
-          <div
-            className="flex-1 h-px"
-            style={{ background: "var(--border)" }}
-          ></div>
-          <span
-            className="text-[10px] font-mono"
-            style={{ color: "var(--muted)", letterSpacing: "0.1em" }}
-          >
-            sorted by recency · live from chain
-          </span>
+      {/* ARCHIVE */}
+      <section id="archive">
+        <div className="section-mast">
+          <span className="num">II.</span>
+          <span className="label">The Archive</span>
+          <span className="meta">{total} {total === 1 ? "volume" : "volumes"} · sorted by recency</span>
         </div>
 
         {total === 0 ? (
-          <div className="panel text-center py-20">
-            <div className="text-5xl mb-4">✍</div>
-            <div
-              className="font-news text-xl mb-2"
-              style={{ fontStyle: "italic" }}
-            >
-              No articles yet.
-            </div>
-            <div
-              className="text-sm mb-6"
-              style={{ color: "var(--muted)" }}
-            >
-              Be the first writer on InkFi.
-            </div>
+          <div className="surface text-center py-24">
+            <div className="text-7xl mb-6 text-brass">✎</div>
+            <h3 className="font-display italic text-3xl mb-2">The archive is empty.</h3>
+            <p className="text-paper-mute mb-8 max-w-md mx-auto">
+              No volumes have been inscribed yet. Be the first to publish to OPN Chain.
+            </p>
             <Link href="/write" className="btn btn-primary">
-              Publish the first article
+              ✎ Inscribe the first volume
             </Link>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
             {ids.map((id, i) => (
               <ArticleCard key={id} id={id} index={i} />
             ))}
@@ -207,31 +152,37 @@ export default function Home() {
   );
 }
 
-function Stat({
+function Ledger({
   label,
   value,
+  sub,
+  unit,
   mono,
-  accent,
+  emphasis,
 }: {
   label: string;
   value: string;
+  sub?: string;
+  unit?: string;
   mono?: boolean;
-  accent?: boolean;
+  emphasis?: boolean;
 }) {
   return (
-    <div className="stat-card">
+    <div className="px-6 py-7 text-center first:pl-2 last:pr-2">
+      <div className="label-engraved mb-2">{label}</div>
       <div
-        className="text-[10px] font-mono uppercase"
-        style={{ color: "var(--muted)", letterSpacing: "0.2em" }}
-      >
-        {label}
-      </div>
-      <div
-        className={`mt-1.5 text-2xl ${mono ? "font-mono" : "font-serif"}`}
-        style={{ color: accent ? "var(--gold-light)" : "var(--paper)" }}
+        className={`leading-none ${mono ? "font-mono text-2xl" : "font-display text-5xl font-semibold"} ${
+          emphasis ? "text-brass-bright" : "text-paper"
+        }`}
       >
         {value}
+        {unit && <span className="text-base ml-2 text-paper-mute font-mono">{unit}</span>}
       </div>
+      {sub && (
+        <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-paper-mute">
+          {sub}
+        </div>
+      )}
     </div>
   );
 }
@@ -258,9 +209,9 @@ function ArticleCard({ id, index }: { id: number; index: number }) {
 
   if (!data) {
     return (
-      <div className="panel-soft p-5 space-y-3">
+      <div className="surface p-6 space-y-3">
         <div className="skeleton h-3 w-24" />
-        <div className="skeleton h-6 w-2/3" />
+        <div className="skeleton h-7 w-2/3" />
         <div className="skeleton h-4 w-full" />
         <div className="skeleton h-4 w-5/6" />
       </div>
@@ -274,72 +225,87 @@ function ArticleCard({ id, index }: { id: number; index: number }) {
     string,
     `0x${string}`,
   ];
-
   const tvlVal = (tvl as bigint | undefined) ?? 0n;
 
   return (
     <Link
       href={`/article/${id}`}
       className="block animate-fade-up"
-      style={{ animationDelay: `${index * 60}ms` }}
+      style={{ animationDelay: `${index * 50}ms` }}
     >
-      <article
-        className="panel-soft p-5 h-full transition"
-        style={{
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <div
+      <article className="surface p-6 h-full hover:bg-walnut-warm transition-colors duration-300 relative overflow-hidden">
+        {/* big ghost roman numeral background */}
+        <span
           aria-hidden
-          className="absolute top-3 right-4 font-serif"
-          style={{
-            fontSize: "44px",
-            color: "rgba(255, 255, 255, 0.04)",
-            lineHeight: 1,
-          }}
+          className="absolute -top-2 -right-2 font-display italic text-brass/[0.07] pointer-events-none"
+          style={{ fontSize: "120px", lineHeight: 1 }}
         >
-          {String(id).padStart(2, "0")}
-        </div>
-        <div className="flex items-center gap-2 mb-3 relative z-10">
-          <span className="pill pill-mute font-mono">#{id}</span>
-          <span className="pill pill-mute">v{version}</span>
+          {toRoman(id)}
+        </span>
+
+        <div className="flex items-center gap-2 mb-4 relative z-10">
+          <span className="stamp stamp-mute font-mono">
+            № {String(id).padStart(3, "0")}
+          </span>
+          <span className="stamp stamp-mute">v{version}</span>
           {tvlVal > 0n && (
-            <span className="pill pill-gold">
-              <span className="dot dot-gold"></span>
-              {fmt(tvlVal, 2)} staked
+            <span className="stamp stamp-brass">
+              <span className="dot dot-brass" />
+              {fmt(tvlVal, 2)} OPN staked
             </span>
           )}
         </div>
-        <h3
-          className="font-news text-xl leading-snug mb-3 line-clamp-2"
-          style={{ fontStyle: "italic", color: "var(--paper)" }}
-        >
+
+        <h3 className="font-display italic text-[26px] leading-[1.15] mb-3 text-paper">
           {local?.title ?? (
-            <span style={{ color: "var(--muted)" }}>
-              (off-chain title not in cache)
-            </span>
+            <span className="text-paper-mute">(off-chain title not in cache)</span>
           )}
         </h3>
-        <p
-          className="text-sm leading-relaxed line-clamp-3 mb-4"
-          style={{ color: "rgba(244, 240, 232, 0.55)" }}
-        >
-          {local?.body?.slice(0, 200) ?? contentURI}
+
+        <p className="text-paper-mute text-[14px] leading-relaxed line-clamp-3 mb-5 font-body">
+          {local?.body?.slice(0, 220) ?? contentURI}
         </p>
-        <div
-          className="flex items-center justify-between text-xs pt-3"
-          style={{
-            borderTop: "1px solid var(--border)",
-            color: "var(--muted)",
-          }}
-        >
-          <span className="font-mono">{shortAddr(writer)}</span>
-          <span style={{ color: "var(--gold)" }} className="font-mono">
-            read →
+
+        <div className="rule mb-3"><span className="rule-dot" /></div>
+
+        <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.18em]">
+          <span className="text-paper-mute">{shortAddr(writer)}</span>
+          <span className="text-brass">
+            {new Date(Number(createdAt) * 1000).toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+            })}
           </span>
+          <span className="text-brass">read →</span>
         </div>
       </article>
     </Link>
   );
+}
+
+const ROMAN: [number, string][] = [
+  [1000, "M"],
+  [900, "CM"],
+  [500, "D"],
+  [400, "CD"],
+  [100, "C"],
+  [90, "XC"],
+  [50, "L"],
+  [40, "XL"],
+  [10, "X"],
+  [9, "IX"],
+  [5, "V"],
+  [4, "IV"],
+  [1, "I"],
+];
+
+function toRoman(n: number): string {
+  let s = "";
+  for (const [v, sym] of ROMAN) {
+    while (n >= v) {
+      s += sym;
+      n -= v;
+    }
+  }
+  return s || "I";
 }

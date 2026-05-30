@@ -16,52 +16,25 @@ export function TxStatus({
 }) {
   if (error) {
     return (
-      <div
-        className="mt-3 px-3 py-2 rounded-md text-[11px] font-mono break-words"
-        style={{
-          background: "rgba(239, 68, 68, 0.08)",
-          border: "1px solid rgba(239, 68, 68, 0.25)",
-          color: "#fca5a5",
-        }}
-      >
+      <div className="mt-3 px-3 py-2 rounded-sm text-[11px] font-mono break-words border bg-stamp/10 border-stamp/40 text-stamp-bright">
         ✗ {error.message.split("\n")[0]}
       </div>
     );
   }
   if (isPending)
     return (
-      <div
-        className="mt-3 px-3 py-2 rounded-md text-[11px] font-mono"
-        style={{
-          background: "var(--surface)",
-          border: "1px solid var(--border)",
-          color: "var(--muted)",
-        }}
-      >
-        <span
-          className="inline-block w-1.5 h-1.5 rounded-full mr-2 animate-blink"
-          style={{ background: "var(--gold)" }}
-        />
-        Awaiting wallet…
+      <div className="mt-3 px-3 py-2 rounded-sm text-[11px] font-mono uppercase tracking-[0.14em] border border-rule bg-walnut-mid text-paper-mute">
+        <span className="dot dot-brass mr-2" />
+        awaiting wallet…
       </div>
     );
   if (isConfirming)
     return (
-      <div
-        className="mt-3 px-3 py-2 rounded-md text-[11px] font-mono"
-        style={{
-          background: "var(--surface)",
-          border: "1px solid var(--border)",
-          color: "var(--muted)",
-        }}
-      >
-        <span
-          className="inline-block w-1.5 h-1.5 rounded-full mr-2 animate-blink"
-          style={{ background: "var(--stream)" }}
-        />
-        Confirming on OPN Chain
+      <div className="mt-3 px-3 py-2 rounded-sm text-[11px] font-mono uppercase tracking-[0.14em] border border-rule bg-walnut-mid text-paper-mute">
+        <span className="dot dot-stream mr-2" />
+        confirming on OPN
         {hash && (
-          <span className="ml-2" style={{ color: "var(--muted)" }}>
+          <span className="ml-2 normal-case text-paper-faint">
             {hash.slice(0, 10)}…
           </span>
         )}
@@ -69,15 +42,8 @@ export function TxStatus({
     );
   if (isConfirmed)
     return (
-      <div
-        className="mt-3 px-3 py-2 rounded-md text-[11px] font-mono"
-        style={{
-          background: "rgba(16, 185, 129, 0.1)",
-          border: "1px solid rgba(16, 185, 129, 0.3)",
-          color: "var(--yield)",
-        }}
-      >
-        ✓ Confirmed on-chain
+      <div className="mt-3 px-3 py-2 rounded-sm text-[11px] font-mono uppercase tracking-[0.14em] border border-verdigris/40 bg-verdigris/15 text-verdigris-bright">
+        ✓ confirmed on-chain
       </div>
     );
   return null;

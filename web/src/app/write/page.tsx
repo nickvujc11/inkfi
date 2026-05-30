@@ -20,11 +20,9 @@ export default function WritePage() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
 
-  const { writeContractAsync, data: hash, isPending, error } =
-    useWriteContract();
+  const { writeContractAsync, data: hash, isPending, error } = useWriteContract();
   const publicClient = usePublicClient();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({ hash });
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
 
   const wordCount = body.trim().split(/\s+/).filter(Boolean).length;
   const readMin = Math.max(1, Math.ceil(wordCount / 220));
@@ -43,9 +41,7 @@ export default function WritePage() {
       gas: 800_000n,
     });
 
-    const receipt = await publicClient.waitForTransactionReceipt({
-      hash: txHash,
-    });
+    const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
     const log = receipt.logs.find(
       (l) => l.address.toLowerCase() === ADDR.ArticleNFT.toLowerCase()
     );
@@ -64,61 +60,35 @@ export default function WritePage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="mb-8 flex items-start justify-between flex-wrap gap-3">
-        <div>
-          <div
-            className="text-[10px] font-mono uppercase mb-2"
-            style={{ color: "var(--muted)", letterSpacing: "0.3em" }}
-          >
-            new article
-          </div>
-          <h1 className="font-serif text-4xl">Write</h1>
-        </div>
-        <div
-          className="flex gap-2 text-[11px] font-mono"
-          style={{ color: "var(--muted)" }}
-        >
-          <span
-            className="px-3 py-1.5 rounded"
-            style={{
-              background: "var(--surface)",
-              border: "1px solid var(--border)",
-            }}
-          >
-            {wordCount} words
-          </span>
-          <span
-            className="px-3 py-1.5 rounded"
-            style={{
-              background: "var(--surface)",
-              border: "1px solid var(--border)",
-            }}
-          >
-            ~{readMin} min read
-          </span>
-        </div>
+      <div className="section-mast">
+        <span className="num">i.</span>
+        <span className="label">Composition</span>
+        <span className="meta">
+          {wordCount} words · ~{readMin} min
+        </span>
       </div>
 
-      <p
-        className="text-sm mb-6 max-w-2xl font-news"
-        style={{ color: "var(--muted)", fontStyle: "italic" }}
-      >
-        Publishing mints a soulbound NFT to your wallet. The content hash is
-        anchored on OPN Chain. The body is cached locally for the MVP.
+      <p className="font-display italic text-paper-mute mb-8 max-w-2xl">
+        Inscribe a new volume. The hash is etched into OPN Chain. The body is
+        cached locally for the MVP, then rendered on the article page.
       </p>
 
-      <div className="panel">
+      <div className="surface-raised p-10 relative">
+        {/* corner ornaments */}
+        <span className="absolute top-3 left-3 text-brass/40 text-xs">❦</span>
+        <span className="absolute top-3 right-3 text-brass/40 text-xs">❦</span>
+        <span className="absolute bottom-3 left-3 text-brass/40 text-xs">❦</span>
+        <span className="absolute bottom-3 right-3 text-brass/40 text-xs">❦</span>
+
         <input
-          className="w-full bg-transparent border-0 text-3xl md:text-4xl font-serif mb-3 focus:outline-none"
-          style={{ color: "var(--paper)" }}
-          placeholder="An untitled story…"
+          className="w-full bg-transparent border-0 text-[42px] md:text-[56px] font-display font-semibold leading-tight mb-2 focus:outline-none text-paper placeholder:text-paper-mute"
+          placeholder="An untitled volume…"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-        <div className="h-px mb-4" style={{ background: "var(--border)" }} />
+        <div className="rule mb-6"><span className="rule-dot" /></div>
         <textarea
-          className="w-full bg-transparent border-0 font-news text-lg leading-relaxed h-[60vh] resize-none focus:outline-none"
-          style={{ color: "var(--paper)" }}
+          className="w-full bg-transparent border-0 font-display text-[19px] leading-[1.7] h-[60vh] resize-none focus:outline-none text-paper placeholder:text-paper-mute placeholder:italic"
           placeholder="Tell your story. The chain is listening."
           value={body}
           onChange={(e) => setBody(e.target.value)}
@@ -128,21 +98,14 @@ export default function WritePage() {
       <div className="mt-6 flex items-center gap-4 sticky bottom-4">
         <button
           className="btn btn-primary"
-          disabled={
-            !isConnected || !title || !body || isPending || isConfirming
-          }
+          disabled={!isConnected || !title || !body || isPending || isConfirming}
           onClick={publish}
         >
-          {isPending || isConfirming
-            ? "Publishing…"
-            : "Publish to OPN Chain →"}
+          {isPending || isConfirming ? "Inscribing…" : "✎ Inscribe to OPN Chain"}
         </button>
         {!isConnected && (
-          <span
-            className="text-xs"
-            style={{ color: "var(--muted)" }}
-          >
-            Connect wallet to publish.
+          <span className="text-xs text-paper-mute font-mono uppercase tracking-[0.14em]">
+            Connect wallet to inscribe.
           </span>
         )}
       </div>
