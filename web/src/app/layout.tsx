@@ -87,25 +87,51 @@ export default function RootLayout({
                 {children}
               </main>
 
-              <footer
-                className="px-6 lg:px-10 py-6 mt-12"
-                style={{
-                  borderTop: "1px solid var(--border)",
-                  color: "var(--muted)",
-                }}
-              >
-                <div className="ornament mb-5">❦ ⁂ ❦</div>
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs font-mono">
-                  <div style={{ letterSpacing: "0.1em" }}>
-                    InkFi · A Library of Letters · Open Finance for Writers
-                  </div>
-                  <div className="flex gap-5">
-                    <a href="https://chain.iopn.io">OPN Chain</a>
-                    <a href="https://github.com/nickvujc11/inkfi">GitHub</a>
-                    <a href="https://builders.iopn.tech">Builders</a>
+              {/* Fancy footer with deco striping */}
+              <div className="mt-16">
+                <div className="fancy-footer" aria-hidden></div>
+                <div className="fancy-footer-inner">
+                  <div className="px-6 lg:px-10 max-w-6xl mx-auto">
+                    <div className="ornament mb-6">❦ ⁂ ❦</div>
+                    <div className="text-center mb-5">
+                      <div
+                        className="font-display italic"
+                        style={{
+                          color: "var(--parchment-2)",
+                          fontSize: "1.3rem",
+                        }}
+                      >
+                        Printed on OPN Chain · MMXXVI
+                      </div>
+                      <div
+                        className="kicker mt-2"
+                        style={{ letterSpacing: "0.4em" }}
+                      >
+                        Open Finance for Writers
+                      </div>
+                    </div>
+                    <div
+                      className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs font-mono pt-5"
+                      style={{
+                        borderTop: "1px solid var(--border)",
+                        color: "var(--muted)",
+                      }}
+                    >
+                      <div style={{ letterSpacing: "0.1em" }}>
+                        ◆ Folio I · Page MCMXXVI · A Library of Letters
+                      </div>
+                      <div className="flex gap-5">
+                        <a href="https://chain.iopn.io">OPN Chain</a>
+                        <a href="https://github.com/nickvujc11/inkfi">
+                          GitHub
+                        </a>
+                        <a href="https://builders.iopn.tech">Builders</a>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </footer>
+                <div className="fancy-footer" aria-hidden></div>
+              </div>
             </div>
           </div>
         </Providers>

@@ -121,7 +121,7 @@ export default function DashboardPage() {
   const myArticlesTvl = myArticles.reduce((s, r) => s + r.totalStaked, 0n);
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 page-in">
       {/* Page header */}
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
@@ -428,7 +428,7 @@ function VaultCard({
       : 0;
 
   return (
-    <div className="shelf-card p-5">
+    <div className="shelf-card book-lift p-5">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="stamp stamp-muted">Folio {String(row.id).padStart(2, "0")}</span>
@@ -533,7 +533,7 @@ function ArticleOwnCard({
   return (
     <Link href={`/article/${row.id}`}>
       <div
-        className="shelf-card shelf-card-hover p-5 h-full"
+        className="shelf-card book-lift p-5 h-full"
         style={{ cursor: "pointer" }}
       >
         <div className="flex items-center justify-between mb-3">

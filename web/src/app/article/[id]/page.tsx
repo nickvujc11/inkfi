@@ -77,7 +77,7 @@ export default function ArticlePage({ params }: { params: Promise<Params> }) {
   const readMin = Math.max(1, Math.ceil(wordCount / 220));
 
   return (
-    <div className="grid lg:grid-cols-[1fr_360px] gap-12">
+    <div className="grid lg:grid-cols-[1fr_360px] gap-12 page-in">
       <article>
         <div className="kicker mb-3">
           ❦ Folio {String(idStr).padStart(2, "0")} · Version {version}

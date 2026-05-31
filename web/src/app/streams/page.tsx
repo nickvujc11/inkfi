@@ -15,7 +15,7 @@ import { TxStatus } from "@/components/PendingTx";
 
 export default function StreamsPage() {
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 page-in">
       <div>
         <div className="kicker mb-2">∾ The Subscription</div>
         <h1

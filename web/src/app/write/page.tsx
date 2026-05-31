@@ -63,7 +63,7 @@ export default function WritePage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-3xl mx-auto page-in">
       <div className="mb-8 flex items-start justify-between flex-wrap gap-3">
         <div>
           <div className="kicker mb-2">The Inkwell</div>
