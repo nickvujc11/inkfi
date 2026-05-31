@@ -106,7 +106,10 @@ export default function Home() {
         </p>
 
         <div className="mt-9 flex gap-3 justify-center flex-wrap">
-          <Link href="/write" className="btn btn-brass">
+          <Link href="/staking" className="btn btn-brass">
+            ❀ Endow a Volume
+          </Link>
+          <Link href="/write" className="btn btn-ghost">
             ✒ Take Up the Pen
           </Link>
           <Link href="#stacks" className="btn btn-ghost">

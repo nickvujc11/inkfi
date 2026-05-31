@@ -50,8 +50,9 @@ export default function RootLayout({
                 >
                   {[
                     { href: "/", text: "Library" },
-                    { href: "/dashboard", text: "Ledger" },
+                    { href: "/staking", text: "Endowments" },
                     { href: "/streams", text: "Streams" },
+                    { href: "/dashboard", text: "Ledger" },
                     { href: "/write", text: "Inkwell" },
                   ].map((it) => (
                     <Link

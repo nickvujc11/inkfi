@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAccount, useReadContract } from "wagmi";
+import { useAccount, useReadContract, useReadContracts } from "wagmi";
 import Logo from "./Logo";
 import { ADDR } from "@/lib/addresses";
-import { articleNftAbi } from "@/lib/abis";
-import { shortAddr } from "@/lib/format";
+import { articleNftAbi, vaultAbi } from "@/lib/abis";
+import { fmt, shortAddr } from "@/lib/format";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -19,19 +19,61 @@ export default function Sidebar() {
     query: { refetchInterval: 8000 },
   });
   const total = nextId ? Number(nextId) : 0;
+  const ids = Array.from({ length: total }, (_, i) => i + 1);
+
+  // Read each user's stake + pending across all vaults to surface in sidebar
+  const { data: positions } = useReadContracts({
+    contracts:
+      address && ids.length > 0
+        ? ids.flatMap(
+            (id) =>
+              [
+                {
+                  address: ADDR.Vault,
+                  abi: vaultAbi,
+                  functionName: "userInfo",
+                  args: [BigInt(id), address],
+                } as const,
+                {
+                  address: ADDR.Vault,
+                  abi: vaultAbi,
+                  functionName: "pendingReward",
+                  args: [BigInt(id), address],
+                } as const,
+              ] as const
+          )
+        : [],
+    query: { enabled: !!address && ids.length > 0, refetchInterval: 5000 },
+  });
+
+  let myTotalStake = 0n;
+  let myTotalPending = 0n;
+  if (positions) {
+    for (let i = 0; i < ids.length; i++) {
+      const ui = positions[i * 2];
+      const p = positions[i * 2 + 1];
+      if (ui?.status === "success") {
+        myTotalStake += (ui.result as readonly [bigint, bigint, bigint])[0];
+      }
+      if (p?.status === "success") {
+        myTotalPending += p.result as bigint;
+      }
+    }
+  }
 
   const sections = [
     {
       label: "Reading Room",
       items: [
         { href: "/", icon: "❦", text: "The Library" },
+        { href: "/staking", icon: "❀", text: "Endowments" },
         { href: "/streams", icon: "∾", text: "Streams" },
       ],
     },
     {
       label: "Writing Desk",
       items: [
-        { href: "/dashboard", icon: "❀", text: "Ledger" },
+        { href: "/dashboard", icon: "✚", text: "Ledger" },
         { href: "/write", icon: "✒", text: "Inkwell" },
       ],
     },
@@ -89,6 +131,48 @@ export default function Sidebar() {
           </div>
         ))}
 
+        {/* Endowment summary — appears whenever user has any stake/pending */}
+        {isConnected && (myTotalStake > 0n || myTotalPending > 0n) && (
+          <div className="mx-5 mb-5">
+            <div
+              className="p-4 rounded-sm relative overflow-hidden"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(176, 141, 87, 0.1), rgba(0, 0, 0, 0.4))",
+                border: "1px solid rgba(176, 141, 87, 0.3)",
+              }}
+            >
+              <div className="section-label mb-3 text-[8px]">
+                Endowment summary
+              </div>
+              <div className="space-y-2.5">
+                <SidebarStat
+                  label="Endowed"
+                  value={fmt(myTotalStake, 3)}
+                  unit="WOPN"
+                />
+                <SidebarStat
+                  label="Pending"
+                  value={fmt(myTotalPending, 5)}
+                  unit="OPN"
+                  accent
+                />
+              </div>
+              <Link
+                href="/staking"
+                className="block mt-3 text-center text-[11px] font-mono py-1.5 rounded-sm"
+                style={{
+                  background: "rgba(176, 141, 87, 0.18)",
+                  color: "var(--brass-2)",
+                  letterSpacing: "0.06em",
+                }}
+              >
+                Manage →
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Membership card */}
         <div className="mx-5 mb-5">
           <div
@@ -105,39 +189,35 @@ export default function Sidebar() {
             >
               MMXXVI
             </div>
-            <div className="section-label mb-2 text-[8px]">
-              Membership
-            </div>
+            <div className="section-label mb-2 text-[8px]">Membership</div>
             {isConnected && address ? (
-              <>
-                <div className="flex items-center gap-2.5 mb-2">
+              <div className="flex items-center gap-2.5">
+                <div
+                  className="w-8 h-8 flex items-center justify-center font-display text-[16px] rounded-sm"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, var(--brass), var(--leather))",
+                    color: "var(--parchment)",
+                    border: "1px solid var(--brass)",
+                  }}
+                >
+                  {address.slice(2, 3).toUpperCase()}
+                </div>
+                <div>
                   <div
-                    className="w-8 h-8 flex items-center justify-center font-display text-[16px] rounded-sm"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, var(--brass), var(--leather))",
-                      color: "var(--parchment)",
-                      border: "1px solid var(--brass)",
-                    }}
+                    className="font-display text-[14px] italic"
+                    style={{ color: "var(--parchment)" }}
                   >
-                    {address.slice(2, 3).toUpperCase()}
+                    {shortAddr(address)}
                   </div>
-                  <div>
-                    <div
-                      className="font-display text-[14px] italic"
-                      style={{ color: "var(--parchment)" }}
-                    >
-                      {shortAddr(address)}
-                    </div>
-                    <div
-                      className="font-mono text-[9px]"
-                      style={{ color: "var(--muted)", letterSpacing: "0.1em" }}
-                    >
-                      enrolled · OPN 984
-                    </div>
+                  <div
+                    className="font-mono text-[9px]"
+                    style={{ color: "var(--muted)", letterSpacing: "0.1em" }}
+                  >
+                    enrolled · OPN 984
                   </div>
                 </div>
-              </>
+              </div>
             ) : (
               <div
                 className="text-xs italic font-display py-1"
@@ -171,5 +251,44 @@ export default function Sidebar() {
         </span>
       </div>
     </aside>
+  );
+}
+
+function SidebarStat({
+  label,
+  value,
+  unit,
+  accent,
+}: {
+  label: string;
+  value: string;
+  unit: string;
+  accent?: boolean;
+}) {
+  return (
+    <div className="flex items-baseline justify-between">
+      <span
+        className="font-mono text-[9px] uppercase"
+        style={{ color: "var(--muted)", letterSpacing: "0.18em" }}
+      >
+        {label}
+      </span>
+      <span
+        className="font-display italic"
+        style={{
+          color: accent ? "var(--brass-2)" : "var(--parchment)",
+          fontSize: "1rem",
+          lineHeight: 1,
+        }}
+      >
+        {value}
+        <span
+          className="font-mono text-[9px] ml-1"
+          style={{ color: "var(--muted)", fontStyle: "normal" }}
+        >
+          {unit}
+        </span>
+      </span>
+    </div>
   );
 }
