@@ -1,61 +1,43 @@
 "use client";
 import Link from "next/link";
 
-/** Library / archive logo: wax seal with quill nib silhouette inside. */
 export function LogoMark({ size = 36 }: { size?: number }) {
   return (
-    <svg
-      viewBox="0 0 48 48"
-      width={size}
-      height={size}
-      fill="none"
-      aria-hidden
-    >
+    <svg viewBox="0 0 48 48" width={size} height={size} fill="none">
       <defs>
-        <radialGradient id="seal-grad" cx="35%" cy="30%" r="80%">
-          <stop offset="0" stopColor="#d4ad6e" />
-          <stop offset="0.55" stopColor="#b08d57" />
-          <stop offset="1" stopColor="#7a5d34" />
-        </radialGradient>
-        <filter id="emboss" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="0.6" />
-        </filter>
+        <linearGradient id="brass-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#d4b97d" />
+          <stop offset="1" stopColor="#b08d57" />
+        </linearGradient>
       </defs>
-      {/* outer wax seal disk */}
-      <circle cx="24" cy="24" r="22" fill="url(#seal-grad)" />
-      {/* engraved ring */}
-      <circle
-        cx="24"
-        cy="24"
-        r="18"
-        fill="none"
+      {/* Quill stem (diagonal) */}
+      <path
+        d="M14 36 L26 14"
+        stroke="url(#brass-grad)"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      {/* Feather barbs */}
+      <path
+        d="M22 18 L18 16 M24 22 L20 20 M26 26 L22 24 M28 30 L24 28"
+        stroke="#b08d57"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        opacity="0.65"
+      />
+      {/* Ink drop (stamp red) */}
+      <circle cx="13" cy="38" r="2.5" fill="#9b2c2c" />
+      <circle cx="13" cy="38" r="1" fill="#b03838" opacity="0.6" />
+      {/* Open-book base */}
+      <path
+        d="M8 38 L24 36 L40 38 L40 42 L24 40 L8 42 Z"
+        fill="url(#brass-grad)"
+        opacity="0.4"
+      />
+      <path
+        d="M24 36 L24 40"
         stroke="#1a0f0a"
-        strokeWidth="0.7"
-        opacity="0.55"
-      />
-      {/* quill nib (centered) */}
-      <path
-        d="M24 11 L30 24 L24 36 L18 24 Z"
-        fill="#1a0f0a"
-        opacity="0.85"
-      />
-      {/* nib slit */}
-      <path
-        d="M24 22 L24 36"
-        stroke="#d4ad6e"
-        strokeWidth="0.8"
-        opacity="0.7"
-      />
-      {/* drop ink */}
-      <circle cx="24" cy="33" r="1.6" fill="#d4ad6e" />
-      {/* highlight gloss */}
-      <ellipse
-        cx="17"
-        cy="16"
-        rx="6"
-        ry="3"
-        fill="#fff5e0"
-        opacity="0.18"
+        strokeWidth="0.5"
       />
     </svg>
   );
@@ -64,16 +46,22 @@ export function LogoMark({ size = 36 }: { size?: number }) {
 export default function Logo({ tagline = false }: { tagline?: boolean }) {
   return (
     <Link href="/" className="flex items-center gap-3 group">
-      <div className="transition-transform group-hover:rotate-2 duration-300">
-        <LogoMark size={36} />
+      <div className="transition-transform group-hover:rotate-3">
+        <LogoMark size={40} />
       </div>
-      <div className="leading-tight flex flex-col">
-        <span className="font-display text-[22px] tracking-tight font-semibold text-paper">
-          Ink<span className="text-brass">Fi</span>
+      <div className="leading-none flex flex-col gap-1">
+        <span
+          className="font-display text-[24px] tracking-tight"
+          style={{ color: "var(--parchment)" }}
+        >
+          Ink<span style={{ color: "var(--brass-2)", fontStyle: "italic" }}>Fi</span>
         </span>
         {tagline && (
-          <span className="font-mono text-[9px] uppercase mt-0.5 text-brass tracking-[0.28em]">
-            archive of finance
+          <span
+            className="font-mono text-[9px] uppercase"
+            style={{ color: "var(--brass)", letterSpacing: "0.3em" }}
+          >
+            Library of Letters
           </span>
         )}
       </div>

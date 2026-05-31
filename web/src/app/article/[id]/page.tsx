@@ -56,8 +56,11 @@ export default function ArticlePage({ params }: { params: Promise<Params> }) {
 
   if (!article) {
     return (
-      <div className="text-center py-20 text-paper-mute font-display italic">
-        Retrieving volume from the archive…
+      <div
+        className="text-center py-24 font-display italic"
+        style={{ color: "var(--parchment-3)" }}
+      >
+        Loading from the archives…
       </div>
     );
   }
@@ -69,53 +72,88 @@ export default function ArticlePage({ params }: { params: Promise<Params> }) {
     ? (userInfo as unknown as readonly [bigint, bigint, bigint])[0]
     : 0n;
 
-  const wordCount = (local?.body ?? "").trim().split(/\s+/).filter(Boolean).length;
+  const wordCount = (local?.body ?? "").trim().split(/\s+/).filter(Boolean)
+    .length;
   const readMin = Math.max(1, Math.ceil(wordCount / 220));
 
   return (
     <div className="grid lg:grid-cols-[1fr_360px] gap-12">
-      <article className="max-w-[680px]">
-        <div className="flex items-center gap-2 mb-5">
-          <span className="stamp stamp-mute">№ {idStr.padStart(3, "0")}</span>
-          <span className="stamp stamp-mute">v{version}</span>
-          <span className="font-mono text-[11px] text-paper-mute">
-            by {shortAddr(writer)}
-          </span>
+      <article>
+        <div className="kicker mb-3">
+          ❦ Folio {String(idStr).padStart(2, "0")} · Version {version}
         </div>
-        <h1 className="font-display text-[56px] md:text-[68px] leading-[0.95] tracking-tight mb-6 text-paper">
+        <h1
+          className="font-display mb-5"
+          style={{
+            fontSize: "clamp(36px, 5vw, 56px)",
+            lineHeight: 1.05,
+            letterSpacing: "-0.01em",
+            color: "var(--parchment)",
+            fontStyle: "italic",
+            fontWeight: 600,
+          }}
+        >
           {local?.title ?? (
-            <span className="text-paper-mute italic">(off-chain title not in cache)</span>
+            <span style={{ color: "var(--muted)" }}>(an untitled volume)</span>
           )}
         </h1>
-        <div className="rule mb-6"><span className="rule-dot" /></div>
-        <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.22em] mb-12 flex-wrap text-paper-mute">
+
+        {/* Byline */}
+        <div className="flex items-center gap-3 mb-2 flex-wrap">
+          <span
+            className="font-display italic"
+            style={{
+              color: "var(--parchment-2)",
+              fontSize: "1.05rem",
+            }}
+          >
+            scribed by{" "}
+            <span
+              className="font-mono not-italic"
+              style={{ color: "var(--brass-2)" }}
+            >
+              {shortAddr(writer)}
+            </span>
+          </span>
+        </div>
+        <div
+          className="flex items-center gap-3 text-[11px] mb-10 font-mono flex-wrap"
+          style={{ color: "var(--muted)", letterSpacing: "0.05em" }}
+        >
           <span>
             {new Date(Number(createdAt) * 1000).toLocaleDateString(undefined, {
               dateStyle: "long",
             })}
           </span>
-          <span className="text-brass">·</span>
+          <span>·</span>
           <span>
             {wordCount} words · {readMin} min
           </span>
-          <span className="text-brass">·</span>
-          <span title={contentHash} className="lowercase">
-            hash {contentHash.slice(0, 10)}…
-          </span>
+          <span>·</span>
+          <span title={contentHash}>seal {contentHash.slice(0, 10)}…</span>
         </div>
 
-        <div className="prose-ink whitespace-pre-wrap">
+        <div className="engraved-rule mb-10" />
+
+        <div className="prose-book drop-cap whitespace-pre-wrap">
           {local?.body ?? (
-            <span className="text-paper-mute italic">
-              (Article body is stored locally for the MVP. Open this article on
-              the device where it was published, or wire up IPFS to fetch from
-              the contentURI on-chain.)
+            <span
+              style={{ color: "var(--muted)", fontStyle: "italic" }}
+              className="prose-book"
+            >
+              The body of this volume is stored in the local cache and is not
+              present on this device. Open it on the device where it was
+              inscribed, or consult the contentURI on-chain.
             </span>
           )}
         </div>
 
-        <div className="mt-20 pt-6 border-t border-rule font-mono text-[10px] uppercase tracking-[0.22em] text-paper-mute">
-          <span className="text-brass">contentURI</span> · {contentURI}
+        <div className="ornament mt-16 mb-6">❦</div>
+        <div
+          className="font-mono text-[11px] text-center"
+          style={{ color: "var(--muted)", letterSpacing: "0.1em" }}
+        >
+          contentURI · {contentURI}
         </div>
       </article>
 
@@ -153,8 +191,11 @@ function TipPanel({
 }) {
   const [amt, setAmt] = useState("0.1");
   const [memo, setMemo] = useState("");
-  const { writeContractAsync, data: hash, isPending, error, reset } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+  const { writeContractAsync, data: hash, isPending, error, reset } =
+    useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
 
   useEffect(() => {
     if (isSuccess) {
@@ -165,31 +206,39 @@ function TipPanel({
   }, [isSuccess, onTipped, reset]);
 
   return (
-    <div className="surface p-5">
+    <div className="shelf-card p-5">
       <div className="flex items-center justify-between mb-1">
-        <div className="font-display italic text-[18px] text-paper">Endow</div>
-        <span className="stamp stamp-brass">native OPN</span>
+        <div
+          className="font-display italic"
+          style={{ fontSize: "17px", color: "var(--parchment)" }}
+        >
+          ◎ A Coin to the Scribe
+        </div>
+        <span className="stamp stamp-stamp">tip</span>
       </div>
-      <div className="text-[11px] mb-4 font-mono uppercase tracking-[0.16em] text-paper-mute">
-        70 / 25 / 5 — writer · stakers · treasury
+      <div
+        className="text-[11px] mb-4 font-mono"
+        style={{ color: "var(--muted)", letterSpacing: "0.05em" }}
+      >
+        70% scribe · 25% endowers · 5% archive
       </div>
       <input
-        className="ink-input mb-2"
+        className="ink-input mb-2 font-mono"
         type="number"
         step="0.01"
         min="0.001"
         value={amt}
         onChange={(e) => setAmt(e.target.value)}
-        placeholder="amount in OPN"
+        placeholder="OPN amount"
       />
       <input
         className="ink-input mb-3"
         value={memo}
         onChange={(e) => setMemo(e.target.value)}
-        placeholder="dedication (optional)"
+        placeholder="a note in the margin (optional)"
       />
       <button
-        className="btn btn-primary w-full justify-center"
+        className="btn btn-brass w-full"
         disabled={isPending || isConfirming || !amt}
         onClick={() =>
           writeContractAsync({
@@ -202,7 +251,7 @@ function TipPanel({
           })
         }
       >
-        {isPending || isConfirming ? "Endowing…" : `Endow ${amt} OPN`}
+        {isPending || isConfirming ? "Sending…" : `Tip ${amt} OPN`}
       </button>
       <TxStatus
         hash={hash}
@@ -249,8 +298,11 @@ function StakePanel({
     query: { enabled: !!address, refetchInterval: 5000 },
   });
 
-  const { writeContractAsync, data: hash, isPending, error, reset } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+  const { writeContractAsync, data: hash, isPending, error, reset } =
+    useWriteContract();
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
 
   useEffect(() => {
     if (isSuccess) {
@@ -313,64 +365,99 @@ function StakePanel({
     mode === "stake" && ((allowance as bigint | undefined) ?? 0n) < need;
 
   return (
-    <div className="surface p-5">
+    <div className="shelf-card p-5">
       <div className="flex items-center justify-between mb-1">
-        <div className="font-display italic text-[18px] text-paper">Endorse</div>
+        <div
+          className="font-display italic"
+          style={{ fontSize: "17px", color: "var(--parchment)" }}
+        >
+          ❀ Endow the Volume
+        </div>
         <span className="stamp stamp-verdigris">
-          <span className="dot dot-live" /> live
+          <span className="dot dot-live"></span> live
         </span>
       </div>
-      <div className="text-[11px] mb-4 font-mono uppercase tracking-[0.16em] text-paper-mute">
-        Stake OPN. Earn from tips paid to this volume.
+      <div
+        className="text-[11px] mb-4 font-mono"
+        style={{ color: "var(--muted)", letterSpacing: "0.05em" }}
+      >
+        Endow OPN. Earn from tips paid to this volume.
       </div>
 
       <div className="grid grid-cols-2 gap-2 mb-4">
-        <Tile label="Pool TVL" value={fmt(totalStaked, 4)} />
-        <Tile label="Your Stake" value={fmt(myStaked, 4)} />
+        <Tile label="Endowment" value={fmt(totalStaked, 4)} />
+        <Tile label="Yours" value={fmt(myStaked, 4)} />
       </div>
 
-      <div className="surface-raised p-4 mb-4 relative">
-        <div className="label-engraved mb-1.5">Pending Yield</div>
-        <div className="font-display text-[34px] leading-none text-brass-bright font-semibold">
-          {fmt(pending, 6)}
-          <span className="text-xs ml-2 text-paper-mute font-mono">OPN</span>
+      <div
+        className="p-3 rounded-sm mb-4 relative overflow-hidden"
+        style={{
+          background: "rgba(176, 141, 87, 0.06)",
+          border: "1px solid rgba(176, 141, 87, 0.3)",
+        }}
+      >
+        <div
+          className="absolute top-1 right-2 font-display italic text-[12px]"
+          style={{ color: "var(--brass)", opacity: 0.5 }}
+        >
+          ❦
         </div>
-        {((pending as bigint | undefined) ?? 0n) > 0n && (
+        <div className="kicker mb-1">Pending dividend</div>
+        <div
+          className="font-display"
+          style={{
+            fontSize: "1.55rem",
+            color: "var(--brass-2)",
+            lineHeight: 1,
+          }}
+        >
+          {fmt(pending, 6)}
           <span
-            className="absolute -top-2 -right-2 stamp stamp-stamp stamp-tilt"
-            style={{ transform: "rotate(8deg)" }}
+            className="text-xs ml-1.5 font-mono"
+            style={{ color: "var(--muted)" }}
           >
-            CLAIMABLE
+            OPN
           </span>
-        )}
+        </div>
       </div>
 
-      {/* Mode toggle */}
-      <div className="flex gap-1 mb-3 p-1 rounded-sm bg-walnut-deep border border-rule">
+      <div
+        className="flex gap-1 mb-3 p-1 rounded-sm"
+        style={{
+          background: "rgba(0, 0, 0, 0.3)",
+          border: "1px solid var(--border)",
+        }}
+      >
         <button
-          className={`flex-1 py-1.5 text-[11px] font-mono uppercase tracking-[0.18em] transition ${
-            mode === "stake"
-              ? "bg-brass text-walnut font-semibold"
-              : "text-paper-mute hover:text-paper"
-          }`}
+          className="flex-1 py-1.5 rounded-sm text-xs transition font-medium"
+          style={{
+            background:
+              mode === "stake"
+                ? "linear-gradient(180deg, var(--brass-2), var(--brass))"
+                : "transparent",
+            color: mode === "stake" ? "var(--walnut)" : "var(--parchment-3)",
+          }}
           onClick={() => setMode("stake")}
         >
-          Stake
+          Endow
         </button>
         <button
-          className={`flex-1 py-1.5 text-[11px] font-mono uppercase tracking-[0.18em] transition ${
-            mode === "unstake"
-              ? "bg-brass text-walnut font-semibold"
-              : "text-paper-mute hover:text-paper"
-          }`}
+          className="flex-1 py-1.5 rounded-sm text-xs transition font-medium"
+          style={{
+            background:
+              mode === "unstake"
+                ? "linear-gradient(180deg, var(--brass-2), var(--brass))"
+                : "transparent",
+            color: mode === "unstake" ? "var(--walnut)" : "var(--parchment-3)",
+          }}
           onClick={() => setMode("unstake")}
         >
-          Unstake
+          Withdraw
         </button>
       </div>
 
       <input
-        className="ink-input mb-3"
+        className="ink-input mb-3 font-mono"
         type="number"
         step="0.01"
         min="0"
@@ -380,49 +467,62 @@ function StakePanel({
 
       {mode === "stake" ? (
         <>
-          <div className="text-[11px] mb-2 flex justify-between font-mono text-paper-mute uppercase tracking-[0.14em]">
+          <div
+            className="text-[11px] mb-2 flex justify-between font-mono"
+            style={{ color: "var(--muted)" }}
+          >
             <span>WOPN balance</span>
             <span>{fmt(wopnBal as bigint | undefined, 4)}</span>
           </div>
-          <div className="flex flex-col gap-2">
-            <button className="btn btn-ghost" onClick={wrap} disabled={isPending}>
-              i · Wrap {amt} OPN
+          <div className="flex flex-col gap-1.5">
+            <button
+              className="btn btn-ghost text-[11px]"
+              onClick={wrap}
+              disabled={isPending}
+            >
+              I · Wrap {amt} OPN → WOPN
             </button>
             {needsApproval && (
-              <button className="btn btn-ghost" onClick={approve} disabled={isPending}>
-                ii · Approve vault
+              <button
+                className="btn btn-ghost text-[11px]"
+                onClick={approve}
+                disabled={isPending}
+              >
+                II · Approve the vault
               </button>
             )}
             <button
-              className="btn btn-primary justify-center"
-              disabled={!isConnected || isPending || isConfirming || needsApproval}
+              className="btn btn-brass"
+              disabled={
+                !isConnected || isPending || isConfirming || needsApproval
+              }
               onClick={stake}
             >
               {needsApproval
                 ? "Approve to enable"
                 : isPending || isConfirming
-                  ? "Endorsing…"
-                  : `Endorse ${amt} WOPN`}
+                  ? "Endowing…"
+                  : `Endow ${amt} WOPN`}
             </button>
           </div>
         </>
       ) : (
         <button
-          className="btn btn-primary w-full justify-center"
+          className="btn btn-brass w-full"
           disabled={!isConnected || isPending || isConfirming}
           onClick={unstake}
         >
-          Unstake {amt} WOPN
+          Withdraw {amt} WOPN
         </button>
       )}
 
       {((pending as bigint | undefined) ?? 0n) > 0n && (
         <button
-          className="btn btn-stamp w-full justify-center mt-3"
+          className="btn btn-verdigris w-full mt-3"
           onClick={claim}
           disabled={isPending || isConfirming}
         >
-          ✓ Claim {fmt(pending, 6)} OPN
+          ✓ Collect {fmt(pending, 6)} OPN dividend
         </button>
       )}
 
@@ -439,9 +539,20 @@ function StakePanel({
 
 function Tile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-walnut-deep border border-rule rounded-sm p-3">
-      <div className="label-engraved">{label}</div>
-      <div className="font-mono mt-1 text-[16px] text-paper">{value}</div>
+    <div
+      className="p-2.5 rounded-sm"
+      style={{
+        background: "rgba(0, 0, 0, 0.25)",
+        border: "1px solid var(--border)",
+      }}
+    >
+      <div className="kicker text-[9px] mb-1">{label}</div>
+      <div
+        className="font-mono text-base"
+        style={{ color: "var(--parchment)" }}
+      >
+        {value}
+      </div>
     </div>
   );
 }

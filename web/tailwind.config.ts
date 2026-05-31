@@ -5,44 +5,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        walnut: {
-          deep: "#0e0805",
-          DEFAULT: "#1a0f0a",
-          mid: "#241710",
-          warm: "#2e1d12",
-        },
-        paper: {
-          DEFAULT: "#f1e8d6",
-          dim: "rgba(241, 232, 214, 0.78)",
-          mute: "rgba(241, 232, 214, 0.5)",
-          faint: "rgba(241, 232, 214, 0.18)",
-        },
-        brass: {
-          DEFAULT: "#b08d57",
-          bright: "#d4ad6e",
-          dim: "rgba(176, 141, 87, 0.18)",
-          edge: "rgba(176, 141, 87, 0.35)",
-        },
-        stamp: {
-          DEFAULT: "#9b2c2c",
-          bright: "#c0392b",
-        },
-        verdigris: {
-          DEFAULT: "#2f5f4f",
-          bright: "#4a8975",
-        },
-        ink: {
-          indigo: "#2a3a5e",
-          "indigo-bright": "#4a6c9a",
-        },
-        rule: {
-          DEFAULT: "rgba(176, 141, 87, 0.22)",
-          strong: "rgba(176, 141, 87, 0.4)",
-        },
+        walnut: { DEFAULT: "#1a0f0a", 2: "#221610", 3: "#2c1d14" },
+        leather: { DEFAULT: "#3a2418", 2: "#4a2e1f" },
+        parchment: { DEFAULT: "#f1e8d6", 2: "#e6dabe", 3: "#c9bca0" },
+        brass: { DEFAULT: "#b08d57", 2: "#c9a66b", 3: "#d4b97d" },
+        stamp: { DEFAULT: "#9b2c2c", 2: "#b03838" },
+        verdigris: { DEFAULT: "#5b8b6e", 2: "#7aab8c" },
+        indigo: { DEFAULT: "#3d4a7a", 2: "#5b6ba0" },
+        muted: "#6b5a48",
       },
       fontFamily: {
-        display: ['"Cormorant"', "ui-serif", "Georgia", "serif"],
-        body: ['"Inter"', "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ['"Cormorant Garamond"', "ui-serif", "Georgia", "serif"],
+        sans: ['"Inter"', "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ['"JetBrains Mono"', "ui-monospace", "monospace"],
       },
     },

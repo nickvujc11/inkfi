@@ -7,14 +7,14 @@ import Logo from "@/components/Logo";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "InkFi — Archive of Finance",
+  title: "InkFi — Library of Letters",
   description:
-    "An archive where every article is a yield-bearing asset. Tip, stake, and stream OPN to writers — fully on-chain on OPN Chain.",
+    "A library where every volume is a yield-bearing asset. Tip, stake, and stream OPN to writers — fully on-chain on OPN Chain.",
   icons: { icon: "/favicon.svg" },
   openGraph: {
-    title: "InkFi — Archive of Finance",
+    title: "InkFi — Library of Letters",
     description:
-      "Articles as yield-bearing volumes on OPN Chain. Tip, stake, and stream OPN to writers.",
+      "A library where every volume is a yield-bearing asset on OPN Chain.",
   },
 };
 
@@ -27,27 +27,38 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          <div className="flex min-h-screen relative z-0">
+          <div className="flex min-h-screen">
             <Sidebar />
 
             <div className="flex-1 flex flex-col min-w-0">
-              {/* mobile / top bar */}
-              <header className="lg:hidden sticky top-0 z-30 backdrop-blur-md border-b border-rule bg-walnut/85">
+              {/* Mobile header */}
+              <header
+                className="lg:hidden sticky top-0 z-30"
+                style={{
+                  borderBottom: "1px solid var(--border)",
+                  background: "rgba(26, 15, 10, 0.92)",
+                  backdropFilter: "blur(8px)",
+                }}
+              >
                 <div className="px-5 h-16 flex items-center justify-between">
                   <Logo />
                   <ConnectBtn />
                 </div>
-                <nav className="px-5 pb-3 flex gap-1 overflow-x-auto border-t border-rule">
+                <nav
+                  className="px-5 pb-3 flex gap-1 overflow-x-auto"
+                  style={{ borderTop: "1px solid var(--border)" }}
+                >
                   {[
-                    { href: "/", text: "Articles" },
-                    { href: "/dashboard", text: "Dashboard" },
+                    { href: "/", text: "Library" },
+                    { href: "/dashboard", text: "Ledger" },
                     { href: "/streams", text: "Streams" },
-                    { href: "/write", text: "Write" },
+                    { href: "/write", text: "Inkwell" },
                   ].map((it) => (
                     <Link
                       key={it.href}
                       href={it.href}
-                      className="px-3 py-2.5 font-display text-[14px] whitespace-nowrap text-paper-dim hover:text-paper"
+                      className="px-3 py-2 rounded text-sm whitespace-nowrap"
+                      style={{ color: "var(--parchment-3)" }}
                     >
                       {it.text}
                     </Link>
@@ -55,46 +66,43 @@ export default function RootLayout({
                 </nav>
               </header>
 
-              {/* desktop top connect */}
-              <div className="hidden lg:flex items-center justify-between px-10 h-16 border-b border-rule">
-                <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.32em] text-paper-mute">
-                  <span className="text-brass">❧</span>
-                  <span>Open Finance for Writers</span>
-                  <span className="text-brass">·</span>
-                  <span>Established Block 17.521.914</span>
+              {/* Desktop top header */}
+              <div
+                className="hidden lg:flex items-center justify-between px-10 h-16"
+                style={{ borderBottom: "1px solid var(--border)" }}
+              >
+                <div
+                  className="font-mono text-[11px]"
+                  style={{
+                    color: "var(--parchment-3)",
+                    letterSpacing: "0.18em",
+                  }}
+                >
+                  EST. MMXXVI · OPN CHAIN, BLOCK CITY
                 </div>
                 <ConnectBtn />
               </div>
 
-              <main className="flex-1 px-6 lg:px-12 py-10 max-w-[1400px] w-full mx-auto">
+              <main className="flex-1 px-6 lg:px-10 py-10 max-w-[1400px] w-full mx-auto">
                 {children}
               </main>
 
-              <footer className="px-6 lg:px-12 py-7 border-t border-rule">
-                <div className="rule mb-4">
-                  <span className="rule-dot" />
-                </div>
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-[10px] font-mono uppercase tracking-[0.22em] text-paper-mute">
-                  <div>
-                    <span className="text-brass">InkFi</span> · Archive of
-                    Finance · MMXXVI
+              <footer
+                className="px-6 lg:px-10 py-6 mt-12"
+                style={{
+                  borderTop: "1px solid var(--border)",
+                  color: "var(--muted)",
+                }}
+              >
+                <div className="ornament mb-5">❦ ⁂ ❦</div>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs font-mono">
+                  <div style={{ letterSpacing: "0.1em" }}>
+                    InkFi · A Library of Letters · Open Finance for Writers
                   </div>
-                  <div className="flex gap-6">
-                    <a href="https://chain.iopn.io" className="hover:text-brass">
-                      OPN Chain
-                    </a>
-                    <a
-                      href="https://github.com/nickvujc11/inkfi"
-                      className="hover:text-brass"
-                    >
-                      Repository
-                    </a>
-                    <a
-                      href="https://builders.iopn.tech"
-                      className="hover:text-brass"
-                    >
-                      Builders
-                    </a>
+                  <div className="flex gap-5">
+                    <a href="https://chain.iopn.io">OPN Chain</a>
+                    <a href="https://github.com/nickvujc11/inkfi">GitHub</a>
+                    <a href="https://builders.iopn.tech">Builders</a>
                   </div>
                 </div>
               </footer>

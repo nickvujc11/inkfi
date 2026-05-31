@@ -36,84 +36,135 @@ export default function Home() {
   }
 
   return (
-    <div className="space-y-16">
-      {/* HERO — masthead */}
-      <section className="relative pt-8">
-        <div className="text-center">
-          <div className="label-engraved mb-6">No. I · Vol. {total.toString().padStart(2, "0")}</div>
+    <div>
+      {/* MASTHEAD */}
+      <section className="text-center pb-16">
+        <div className="kicker mb-6">
+          ❦ Volume I · Number One · MMXXVI ❦
+        </div>
+        <div className="engraved-double max-w-2xl mx-auto mb-10" />
+        <h1
+          className="font-display"
+          style={{
+            fontSize: "clamp(48px, 8vw, 96px)",
+            lineHeight: 0.95,
+            letterSpacing: "-0.02em",
+            color: "var(--parchment)",
+          }}
+        >
+          A Library Where
+          <br />
+          <span
+            style={{
+              fontStyle: "italic",
+              color: "var(--brass-2)",
+              fontWeight: 500,
+            }}
+          >
+            Every Volume Earns
+          </span>
+        </h1>
+        <div className="engraved-double max-w-2xl mx-auto mt-10 mb-8" />
 
-          <h1 className="font-display text-[80px] md:text-[120px] leading-[0.88] tracking-tighter text-paper">
-            Write Once.
-            <br />
-            <em className="text-brass italic font-medium">Earn Forever.</em>
-          </h1>
+        <p
+          className="font-display max-w-xl mx-auto leading-relaxed"
+          style={{
+            fontSize: "1.18rem",
+            fontStyle: "italic",
+            color: "var(--parchment-3)",
+          }}
+        >
+          A decentralized library of letters where readers stake on the
+          articles they believe in, writers receive subscriptions per second,
+          and every word is anchored on OPN Chain.
+        </p>
 
-          <div className="rule max-w-md mx-auto mt-8">
-            <span className="rule-dot" />
-          </div>
-
-          <p className="mt-6 max-w-xl mx-auto font-display italic text-[20px] leading-relaxed text-paper-dim">
-            An archive where every article becomes a yield-bearing volume.
-            <br />
-            Tip, stake, and stream <span className="text-brass">OPN</span> to writers — fully on-chain.
-          </p>
-
-          <div className="mt-10 flex gap-3 justify-center flex-wrap">
-            <Link href="/write" className="btn btn-primary">
-              ✎ Compose
-            </Link>
-            <Link href="#archive" className="btn btn-ghost">
-              ❦ Browse Archive
-            </Link>
-          </div>
+        <div className="mt-9 flex gap-3 justify-center flex-wrap">
+          <Link href="/write" className="btn btn-brass">
+            ✒ Take Up the Pen
+          </Link>
+          <Link href="#stacks" className="btn btn-ghost">
+            Browse the Stacks ↓
+          </Link>
         </div>
       </section>
 
-      {/* Live ledger strip */}
-      <section className="grid grid-cols-3 gap-0 border-t border-b border-rule divide-x divide-rule">
-        <Ledger label="Volumes" value={total.toString()} sub="published on-chain" />
-        <Ledger label="Capital at rest" value={`${fmt(totalTvl, 2)}`} unit="OPN" sub="across all vaults" emphasis />
-        <Ledger label="Network" value="OPN · 984" sub="testnet · live" mono />
+      {/* CARD CATALOGUE — 3 stat tiles */}
+      <section className="grid grid-cols-3 gap-3 max-w-3xl mx-auto mb-16">
+        <Stat label="Volumes Inscribed" value={total.toString()} />
+        <Stat
+          label="Capital at Letters"
+          value={fmt(totalTvl, 2)}
+          suffix="OPN"
+          accent
+        />
+        <Stat label="Chain" value="OPN · 984" mono />
       </section>
 
-      {/* THREE PRIMITIVES */}
-      <section>
-        <div className="section-mast">
-          <span className="num">I.</span>
-          <span className="label">Three Primitives</span>
-          <span className="meta">on-chain · soulbound</span>
+      {/* WHY — 3 prinsip */}
+      <section className="mb-20">
+        <div className="text-center mb-10">
+          <div className="section-label mb-2">three primitives</div>
+          <h2
+            className="font-display"
+            style={{
+              fontSize: "2.5rem",
+              fontStyle: "italic",
+              color: "var(--parchment)",
+            }}
+          >
+            How the Library Pays
+          </h2>
         </div>
-
-        <div className="grid md:grid-cols-3 gap-px bg-rule">
+        <div className="grid md:grid-cols-3 gap-4">
           {[
             {
-              num: "i",
-              icon: "✎",
+              num: "I.",
               title: "Inscribe",
-              body: "Compose. Mint a soulbound NFT. Authorship is etched into OPN Chain, immutable and permanent.",
+              body: "Each article is a soulbound volume — the writer's name is etched into its spine permanently. Authorship cannot be sold or laundered.",
+              icon: "✒",
             },
             {
-              num: "ii",
-              icon: "❦",
-              title: "Endorse",
-              body: "Stake OPN on writing you believe in. When tips arrive, stakers earn pro-rata yield.",
+              num: "II.",
+              title: "Endow",
+              body: "Readers endow a volume with capital. When the volume is tipped, endowers earn a pro-rata share through an accumulator pool.",
+              icon: "❀",
             },
             {
-              num: "iii",
-              icon: "∮",
-              title: "Patronise",
-              body: "Subscribe per-second to a writer. OPN flows continuously, made viable by sub-second finality.",
+              num: "III.",
+              title: "Subscribe",
+              body: "Patrons pledge a per-second stream of OPN to a writer. The pledge flows continuously and can be cancelled at will.",
+              icon: "∾",
             },
           ].map((f) => (
-            <div key={f.num} className="bg-walnut p-7 hover:bg-walnut-mid transition-colors duration-300">
+            <div key={f.num} className="shelf-card p-7">
               <div className="flex items-baseline justify-between mb-5">
-                <div className="text-3xl text-brass">{f.icon}</div>
-                <div className="font-display italic text-brass text-2xl">{f.num}</div>
+                <span
+                  className="font-display text-3xl"
+                  style={{ color: "var(--brass-2)", fontStyle: "italic" }}
+                >
+                  {f.num}
+                </span>
+                <span
+                  className="font-display text-2xl"
+                  style={{ color: "var(--brass)" }}
+                >
+                  {f.icon}
+                </span>
               </div>
-              <div className="font-display text-[28px] font-semibold mb-2 text-paper">
+              <div
+                className="font-display text-2xl mb-2.5"
+                style={{ color: "var(--parchment)" }}
+              >
                 {f.title}
               </div>
-              <div className="text-paper-mute text-[14px] leading-relaxed">
+              <div
+                className="font-display leading-relaxed"
+                style={{
+                  color: "var(--parchment-3)",
+                  fontSize: "1.02rem",
+                }}
+              >
                 {f.body}
               </div>
             </div>
@@ -121,27 +172,62 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ARCHIVE */}
-      <section id="archive">
-        <div className="section-mast">
-          <span className="num">II.</span>
-          <span className="label">The Archive</span>
-          <span className="meta">{total} {total === 1 ? "volume" : "volumes"} · sorted by recency</span>
+      <div className="ornament mb-12">❦ ⁂ ❦</div>
+
+      {/* THE STACKS — article feed */}
+      <section id="stacks">
+        <div className="flex items-end justify-between mb-7 flex-wrap gap-3">
+          <div>
+            <div className="section-label mb-2">the stacks</div>
+            <h2
+              className="font-display"
+              style={{
+                fontSize: "2.5rem",
+                fontStyle: "italic",
+                color: "var(--parchment)",
+              }}
+            >
+              Volumes on the Shelves
+            </h2>
+          </div>
+          <span
+            className="font-mono text-[11px]"
+            style={{
+              color: "var(--parchment-3)",
+              letterSpacing: "0.1em",
+            }}
+          >
+            sorted by recency · live from chain
+          </span>
         </div>
+        <div className="engraved-rule mb-6" />
 
         {total === 0 ? (
-          <div className="surface text-center py-24">
-            <div className="text-7xl mb-6 text-brass">✎</div>
-            <h3 className="font-display italic text-3xl mb-2">The archive is empty.</h3>
-            <p className="text-paper-mute mb-8 max-w-md mx-auto">
-              No volumes have been inscribed yet. Be the first to publish to OPN Chain.
-            </p>
-            <Link href="/write" className="btn btn-primary">
-              ✎ Inscribe the first volume
+          <div className="shelf-card text-center py-20">
+            <div
+              className="font-display text-7xl mb-3"
+              style={{ color: "var(--brass)", opacity: 0.3 }}
+            >
+              ✒
+            </div>
+            <div
+              className="font-display italic text-2xl mb-2"
+              style={{ color: "var(--parchment)" }}
+            >
+              The shelves stand empty.
+            </div>
+            <div
+              className="text-sm mb-7 font-display italic"
+              style={{ color: "var(--parchment-3)" }}
+            >
+              Be the first scribe to inscribe a volume here.
+            </div>
+            <Link href="/write" className="btn btn-brass">
+              ✒ Inscribe the first volume
             </Link>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
             {ids.map((id, i) => (
               <ArticleCard key={id} id={id} index={i} />
             ))}
@@ -152,37 +238,40 @@ export default function Home() {
   );
 }
 
-function Ledger({
+function Stat({
   label,
   value,
-  sub,
-  unit,
+  suffix,
   mono,
-  emphasis,
+  accent,
 }: {
   label: string;
   value: string;
-  sub?: string;
-  unit?: string;
+  suffix?: string;
   mono?: boolean;
-  emphasis?: boolean;
+  accent?: boolean;
 }) {
   return (
-    <div className="px-6 py-7 text-center first:pl-2 last:pr-2">
-      <div className="label-engraved mb-2">{label}</div>
+    <div className="shelf-card p-5">
+      <div className="kicker mb-2">{label}</div>
       <div
-        className={`leading-none ${mono ? "font-mono text-2xl" : "font-display text-5xl font-semibold"} ${
-          emphasis ? "text-brass-bright" : "text-paper"
-        }`}
+        className={`${mono ? "font-mono text-xl" : "font-display text-3xl"}`}
+        style={{
+          color: accent ? "var(--brass-2)" : "var(--parchment)",
+          letterSpacing: "-0.01em",
+          lineHeight: 1,
+        }}
       >
         {value}
-        {unit && <span className="text-base ml-2 text-paper-mute font-mono">{unit}</span>}
+        {suffix && (
+          <span
+            className="font-mono text-xs ml-1.5"
+            style={{ color: "var(--muted)" }}
+          >
+            {suffix}
+          </span>
+        )}
       </div>
-      {sub && (
-        <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-paper-mute">
-          {sub}
-        </div>
-      )}
     </div>
   );
 }
@@ -209,7 +298,7 @@ function ArticleCard({ id, index }: { id: number; index: number }) {
 
   if (!data) {
     return (
-      <div className="surface p-6 space-y-3">
+      <div className="shelf-card p-6 space-y-3">
         <div className="skeleton h-3 w-24" />
         <div className="skeleton h-7 w-2/3" />
         <div className="skeleton h-4 w-full" />
@@ -226,86 +315,99 @@ function ArticleCard({ id, index }: { id: number; index: number }) {
     `0x${string}`,
   ];
   const tvlVal = (tvl as bigint | undefined) ?? 0n;
+  const folioNum = String(id).padStart(2, "0");
 
   return (
     <Link
       href={`/article/${id}`}
       className="block animate-fade-up"
-      style={{ animationDelay: `${index * 50}ms` }}
+      style={{ animationDelay: `${index * 60}ms` }}
     >
-      <article className="surface p-6 h-full hover:bg-walnut-warm transition-colors duration-300 relative overflow-hidden">
-        {/* big ghost roman numeral background */}
-        <span
+      <article
+        className="shelf-card shelf-card-hover p-6 h-full relative overflow-hidden"
+        style={{ minHeight: "230px" }}
+      >
+        {/* Folio number watermark */}
+        <div
           aria-hidden
-          className="absolute -top-2 -right-2 font-display italic text-brass/[0.07] pointer-events-none"
-          style={{ fontSize: "120px", lineHeight: 1 }}
+          className="absolute font-display"
+          style={{
+            top: "10px",
+            right: "16px",
+            fontSize: "60px",
+            color: "var(--brass)",
+            opacity: 0.06,
+            lineHeight: 1,
+            fontStyle: "italic",
+          }}
         >
-          {toRoman(id)}
-        </span>
+          {folioNum}
+        </div>
 
-        <div className="flex items-center gap-2 mb-4 relative z-10">
-          <span className="stamp stamp-mute font-mono">
-            № {String(id).padStart(3, "0")}
+        {/* Stamps row */}
+        <div className="flex items-center gap-2 mb-4 flex-wrap relative z-10">
+          <span
+            className="font-mono text-[10px]"
+            style={{
+              color: "var(--brass)",
+              letterSpacing: "0.2em",
+            }}
+          >
+            FOLIO {folioNum}
           </span>
-          <span className="stamp stamp-mute">v{version}</span>
+          <span style={{ color: "var(--muted)" }}>·</span>
+          <span className="stamp stamp-muted">v{version}</span>
           {tvlVal > 0n && (
-            <span className="stamp stamp-brass">
-              <span className="dot dot-brass" />
-              {fmt(tvlVal, 2)} OPN staked
+            <span className="stamp stamp-stamp">
+              ◆ {fmt(tvlVal, 2)} OPN
             </span>
           )}
         </div>
 
-        <h3 className="font-display italic text-[26px] leading-[1.15] mb-3 text-paper">
+        {/* Title */}
+        <h3
+          className="font-display mb-3 line-clamp-2"
+          style={{
+            fontSize: "1.55rem",
+            lineHeight: 1.2,
+            color: "var(--parchment)",
+            fontStyle: "italic",
+          }}
+        >
           {local?.title ?? (
-            <span className="text-paper-mute">(off-chain title not in cache)</span>
+            <span style={{ color: "var(--muted)" }}>
+              (an untitled volume)
+            </span>
           )}
         </h3>
 
-        <p className="text-paper-mute text-[14px] leading-relaxed line-clamp-3 mb-5 font-body">
+        {/* Body preview */}
+        <p
+          className="font-display leading-relaxed line-clamp-3 mb-5"
+          style={{
+            color: "var(--parchment-3)",
+            fontSize: "0.96rem",
+          }}
+        >
           {local?.body?.slice(0, 220) ?? contentURI}
         </p>
 
-        <div className="rule mb-3"><span className="rule-dot" /></div>
-
-        <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.18em]">
-          <span className="text-paper-mute">{shortAddr(writer)}</span>
-          <span className="text-brass">
-            {new Date(Number(createdAt) * 1000).toLocaleDateString(undefined, {
-              month: "short",
-              day: "numeric",
-            })}
+        <div
+          className="flex items-center justify-between text-xs pt-3 mt-auto"
+          style={{
+            borderTop: "1px solid var(--border)",
+            color: "var(--parchment-3)",
+          }}
+        >
+          <span className="font-mono">{shortAddr(writer)}</span>
+          <span
+            className="font-display italic"
+            style={{ color: "var(--brass-2)" }}
+          >
+            Read on →
           </span>
-          <span className="text-brass">read →</span>
         </div>
       </article>
     </Link>
   );
-}
-
-const ROMAN: [number, string][] = [
-  [1000, "M"],
-  [900, "CM"],
-  [500, "D"],
-  [400, "CD"],
-  [100, "C"],
-  [90, "XC"],
-  [50, "L"],
-  [40, "XL"],
-  [10, "X"],
-  [9, "IX"],
-  [5, "V"],
-  [4, "IV"],
-  [1, "I"],
-];
-
-function toRoman(n: number): string {
-  let s = "";
-  for (const [v, sym] of ROMAN) {
-    while (n >= v) {
-      s += sym;
-      n -= v;
-    }
-  }
-  return s || "I";
 }

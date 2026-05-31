@@ -63,7 +63,7 @@ export default function DashboardPage() {
   });
 
   const stride = address ? 4 : 2;
-  type ArticleRow = {
+  type Row = {
     id: number;
     writer: `0x${string}`;
     createdAt: bigint;
@@ -74,7 +74,7 @@ export default function DashboardPage() {
     myStaked: bigint;
   };
 
-  const rows: ArticleRow[] = [];
+  const rows: Row[] = [];
   if (articleReads.data) {
     for (let i = 0; i < ids.length; i++) {
       const id = ids[i];
@@ -113,124 +113,155 @@ export default function DashboardPage() {
   const myArticles = address
     ? rows.filter((r) => r.writer.toLowerCase() === address.toLowerCase())
     : [];
-  const myStakedArticles = address
-    ? rows.filter((r) => r.myStaked > 0n)
-    : [];
+  const myStaked = address ? rows.filter((r) => r.myStaked > 0n) : [];
+
   const totalProtocolTvl = rows.reduce((s, r) => s + r.totalStaked, 0n);
-  const myTotalStake = myStakedArticles.reduce((s, r) => s + r.myStaked, 0n);
-  const myTotalPending = myStakedArticles.reduce((s, r) => s + r.myPending, 0n);
+  const myTotalStake = myStaked.reduce((s, r) => s + r.myStaked, 0n);
+  const myTotalPending = myStaked.reduce((s, r) => s + r.myPending, 0n);
   const myArticlesTvl = myArticles.reduce((s, r) => s + r.totalStaked, 0n);
 
   return (
-    <div className="space-y-12">
-      <div className="flex items-end justify-between flex-wrap gap-4">
+    <div className="space-y-10">
+      {/* Page header */}
+      <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <div className="label-engraved mb-3">Member Ledger</div>
-          <h1 className="font-display text-[60px] leading-[0.95] text-paper">
-            The <em className="text-brass">Reading Room</em>
+          <div className="kicker mb-2">The Reader's Ledger</div>
+          <h1
+            className="font-display"
+            style={{
+              fontSize: "clamp(36px, 5vw, 56px)",
+              lineHeight: 1,
+              color: "var(--parchment)",
+            }}
+          >
+            Your{" "}
+            <span style={{ color: "var(--brass-2)", fontStyle: "italic" }}>
+              Ledger
+            </span>
           </h1>
-          <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.28em] text-paper-mute">
-            Season I · OPN Testnet
-            {block ? ` · Block № ${Number(block).toLocaleString()}` : ""}
+          <p
+            className="font-mono text-[11px] mt-3"
+            style={{ color: "var(--muted)", letterSpacing: "0.06em" }}
+          >
+            Folio of stakes, dividends, and your inscribed volumes
+            {block ? ` · Block #${Number(block).toLocaleString()}` : ""}
           </p>
         </div>
         <div className="flex gap-2">
           <Link href="/" className="btn btn-ghost">
-            ❦ Browse Archive
+            Browse the Library
           </Link>
-          <Link href="/write" className="btn btn-primary">
-            ✎ Compose Volume
+          <Link href="/write" className="btn btn-brass">
+            ✒ New Volume
           </Link>
         </div>
       </div>
 
+      <div className="engraved-double" />
+
       {!isConnected && (
-        <div className="surface text-center py-20">
-          <div className="text-7xl mb-5 text-brass">❧</div>
-          <div className="font-display italic text-3xl mb-2">
-            Connect your wallet
+        <div className="shelf-card text-center py-20">
+          <div
+            className="font-display text-7xl mb-4"
+            style={{ color: "var(--brass)", opacity: 0.35 }}
+          >
+            ❦
           </div>
-          <p className="text-paper-mute mb-8 max-w-md mx-auto">
-            Your reading room surfaces volumes you wrote, vaults you endorsed,
-            and yield ready to claim — directly from on-chain reads.
+          <div
+            className="font-display italic text-2xl mb-2"
+            style={{ color: "var(--parchment)" }}
+          >
+            Sign the Register
+          </div>
+          <p
+            className="text-sm mb-2 font-display italic max-w-md mx-auto"
+            style={{ color: "var(--parchment-3)" }}
+          >
+            Connect your wallet to view your endowments, dividends accrued, and
+            volumes inscribed.
           </p>
         </div>
       )}
 
       {isConnected && (
         <>
-          {/* Member ledger */}
-          <section>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-up">
-              <Stat
-                kind="brass"
-                value={fmt(myTotalPending, 4)}
-                label="Pending Yield"
-                note="OPN claimable"
-              />
-              <Stat
-                kind="verdigris"
-                value={fmt(myTotalStake, 4)}
-                label="Endowed Capital"
-                note={`across ${myStakedArticles.length} ${myStakedArticles.length === 1 ? "vault" : "vaults"}`}
-              />
-              <Stat
-                kind="indigo"
-                value={myArticles.length.toString()}
-                label="Volumes Authored"
-                note={`${fmt(myArticlesTvl, 2)} OPN endowed`}
-              />
-              <Stat
-                kind="brass"
-                value={fmt(totalProtocolTvl, 2)}
-                label="Archive TVL"
-                note={`${total} volumes total`}
-              />
-            </div>
-          </section>
+          {/* Stats */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-up">
+            <Stat
+              kind="brass"
+              label="Pending Dividends"
+              value={fmt(myTotalPending, 4)}
+              note="OPN claimable"
+              icon="◎"
+            />
+            <Stat
+              kind="verdigris"
+              label="Endowed"
+              value={fmt(myTotalStake, 4)}
+              note={`across ${myStaked.length} volume${myStaked.length === 1 ? "" : "s"}`}
+              icon="❀"
+            />
+            <Stat
+              kind="indigo"
+              label="Volumes Authored"
+              value={myArticles.length.toString()}
+              note={`${fmt(myArticlesTvl, 2)} OPN endowed on you`}
+              icon="✒"
+            />
+            <Stat
+              kind="stamp"
+              label="Library TVL"
+              value={fmt(totalProtocolTvl, 2)}
+              note={`${total} volumes total`}
+              icon="◆"
+            />
+          </div>
 
-          {/* Endorsements */}
-          <section>
-            <div className="section-mast">
-              <span className="num">i.</span>
-              <span className="label">Endorsements</span>
-              <span className="meta">
-                {myStakedArticles.length} vault{myStakedArticles.length === 1 ? "" : "s"}
+          {/* Endowments */}
+          <Section
+            title="Endowments held"
+            tag={
+              <span className="stamp stamp-verdigris">
+                <span className="dot dot-live"></span>
+                {myStaked.length} active
               </span>
-            </div>
-            {myStakedArticles.length === 0 ? (
+            }
+          >
+            {myStaked.length === 0 ? (
               <Empty
-                title="No endorsements yet."
-                body="Pick a volume from the archive and stake OPN to begin earning yield."
+                title="No endowments yet."
+                body="Endow OPN on a volume you believe in. Earn dividends when readers tip the volume."
                 cta={
-                  <Link href="/" className="btn btn-primary">
-                    ❦ Browse archive
+                  <Link href="/" className="btn btn-brass">
+                    Browse the stacks
                   </Link>
                 }
               />
             ) : (
               <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {myStakedArticles.map((r) => (
+                {myStaked.map((r) => (
                   <VaultCard key={r.id} row={r} />
                 ))}
               </div>
             )}
-          </section>
+          </Section>
 
-          {/* Authored volumes */}
-          <section>
-            <div className="section-mast">
-              <span className="num">ii.</span>
-              <span className="label">Authored Volumes</span>
-              <span className="meta">{myArticles.length} published</span>
-            </div>
+          {/* My articles */}
+          <Section
+            title="Volumes inscribed"
+            tag={
+              <span className="stamp stamp-brass">
+                {myArticles.length} folios
+              </span>
+            }
+          >
             {myArticles.length === 0 ? (
               <Empty
-                title="No authored volumes."
-                body="Inscribe your first volume — it becomes a soulbound NFT in your wallet."
+                title="The pen has not yet been taken up."
+                body="Inscribe your first volume. Authorship is soulbound to your wallet."
                 cta={
-                  <Link href="/write" className="btn btn-primary">
-                    ✎ Compose
+                  <Link href="/write" className="btn btn-brass">
+                    ✒ Inscribe a volume
                   </Link>
                 }
               />
@@ -241,7 +272,7 @@ export default function DashboardPage() {
                 ))}
               </div>
             )}
-          </section>
+          </Section>
         </>
       )}
     </div>
@@ -250,33 +281,84 @@ export default function DashboardPage() {
 
 function Stat({
   kind,
-  value,
   label,
+  value,
   note,
+  icon,
 }: {
   kind: "brass" | "verdigris" | "indigo" | "stamp";
-  value: string;
   label: string;
+  value: string;
   note?: string;
+  icon: string;
 }) {
-  const colors = {
-    brass: "text-brass-bright",
-    verdigris: "text-verdigris-bright",
-    indigo: "text-ink-indigo-bright",
-    stamp: "text-stamp-bright",
-  };
+  const accent = {
+    brass: "var(--brass-2)",
+    verdigris: "var(--verdigris-2)",
+    indigo: "var(--indigo-2)",
+    stamp: "var(--stamp-2)",
+  }[kind];
+  const bar = {
+    brass: "linear-gradient(90deg, var(--brass), transparent)",
+    verdigris: "linear-gradient(90deg, var(--verdigris), transparent)",
+    indigo: "linear-gradient(90deg, var(--indigo-2), transparent)",
+    stamp: "linear-gradient(90deg, var(--stamp), transparent)",
+  }[kind];
+
   return (
-    <div className="stat-tile">
-      <div className="label-engraved">{label}</div>
-      <div className={`mt-2 font-display text-[34px] leading-none font-semibold ${colors[kind]}`}>
+    <div className="shelf-card p-5 relative overflow-hidden">
+      <div
+        className="absolute top-3 right-4 font-display"
+        style={{ color: accent, fontSize: "20px", opacity: 0.7 }}
+      >
+        {icon}
+      </div>
+      <div className="kicker mb-3">{label}</div>
+      <div
+        className="font-display"
+        style={{
+          fontSize: "2rem",
+          color: "var(--parchment)",
+          lineHeight: 1,
+          letterSpacing: "-0.01em",
+        }}
+      >
         {value}
       </div>
       {note && (
-        <div className="mt-3 text-[10px] font-mono uppercase tracking-[0.18em] text-paper-mute">
+        <div
+          className="text-[11px] mt-3 font-mono"
+          style={{ color: accent, letterSpacing: "0.05em" }}
+        >
           {note}
         </div>
       )}
+      <div
+        className="absolute bottom-0 left-0 right-0"
+        style={{ height: "2px", background: bar }}
+      />
     </div>
+  );
+}
+
+function Section({
+  title,
+  tag,
+  children,
+}: {
+  title: string;
+  tag?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section>
+      <div className="flex items-center gap-4 mb-5">
+        <span className="section-label whitespace-nowrap">{title}</span>
+        <div className="flex-1 engraved-rule" />
+        {tag}
+      </div>
+      {children}
+    </section>
   );
 }
 
@@ -290,9 +372,19 @@ function Empty({
   cta?: React.ReactNode;
 }) {
   return (
-    <div className="surface text-center py-14">
-      <div className="font-display italic text-2xl mb-2">{title}</div>
-      <p className="text-paper-mute mb-6 max-w-md mx-auto">{body}</p>
+    <div className="shelf-card text-center py-12 px-6">
+      <div
+        className="font-display italic text-xl mb-2"
+        style={{ color: "var(--parchment)" }}
+      >
+        {title}
+      </div>
+      <p
+        className="font-display italic mb-5 max-w-md mx-auto"
+        style={{ color: "var(--parchment-3)" }}
+      >
+        {body}
+      </p>
       {cta}
     </div>
   );
@@ -311,7 +403,8 @@ function VaultCard({
 }) {
   const [local, setLocal] = useState<{ title: string } | null>(null);
   useEffect(() => {
-    setLocal(loadArticles()[row.id] ?? null);
+    const all = loadArticles();
+    setLocal(all[row.id] ?? null);
   }, [row.id]);
 
   const { writeContractAsync, data: hash, isPending } = useWriteContract();
@@ -335,59 +428,87 @@ function VaultCard({
       : 0;
 
   return (
-    <div className="surface p-5 transition hover:bg-walnut-warm relative">
+    <div className="shelf-card p-5">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="stamp stamp-mute">№ {String(row.id).padStart(3, "0")}</span>
-          <span className="stamp stamp-brass">
-            <span className="dot dot-brass" /> endorsed
+          <span className="stamp stamp-muted">Folio {String(row.id).padStart(2, "0")}</span>
+          <span className="stamp stamp-verdigris">
+            <span className="dot dot-live"></span> live
           </span>
         </div>
         <Link
           href={`/article/${row.id}`}
-          className="text-[10px] font-mono uppercase tracking-[0.2em] text-paper-mute hover:text-brass"
+          className="font-display italic text-[12px]"
+          style={{ color: "var(--brass-2)" }}
         >
           open →
         </Link>
       </div>
-      <div className="font-display italic text-[18px] leading-snug mb-4 text-paper line-clamp-2">
+      <div
+        className="font-display italic mb-4 line-clamp-2"
+        style={{
+          fontSize: "1.05rem",
+          color: "var(--parchment)",
+          lineHeight: 1.3,
+        }}
+      >
         {local?.title ?? `Volume by ${shortAddr(row.writer)}`}
       </div>
 
       <div className="grid grid-cols-3 gap-2 mb-4">
-        <Metric label="My stake" value={fmt(row.myStaked, 3)} accent="brass" />
-        <Metric label="Pool TVL" value={fmt(row.totalStaked, 2)} accent="indigo" />
-        <Metric label="Share" value={`${sharePct.toFixed(1)}%`} accent="verdigris" />
+        <Metric label="Yours" value={fmt(row.myStaked, 3)} accent="brass" />
+        <Metric label="Pool" value={fmt(row.totalStaked, 2)} accent="indigo" />
+        <Metric
+          label="Share"
+          value={`${sharePct.toFixed(1)}%`}
+          accent="verdigris"
+        />
       </div>
 
-      <div className="surface-raised p-3 mb-3 relative">
-        <div className="label-engraved">pending yield</div>
-        <div className="font-display text-2xl mt-1 leading-none text-brass-bright font-semibold">
-          {fmt(row.myPending, 6)}
-          <span className="text-xs ml-1.5 text-paper-mute font-mono">OPN</span>
+      <div
+        className="p-3 rounded-sm mb-3 relative"
+        style={{
+          background: "rgba(176, 141, 87, 0.06)",
+          border: "1px solid rgba(176, 141, 87, 0.3)",
+        }}
+      >
+        <div
+          className="absolute top-2 right-3 font-display italic text-[10px]"
+          style={{ color: "var(--brass)", opacity: 0.5 }}
+        >
+          ❦
         </div>
-        {row.myPending > 0n && (
+        <div className="kicker mb-1 text-[9px]">Pending dividend</div>
+        <div
+          className="font-display"
+          style={{
+            fontSize: "1.45rem",
+            color: "var(--brass-2)",
+            lineHeight: 1,
+          }}
+        >
+          {fmt(row.myPending, 6)}
           <span
-            className="absolute -top-2 -right-2 stamp stamp-stamp stamp-tilt"
-            style={{ transform: "rotate(7deg)" }}
+            className="text-xs ml-1 font-mono"
+            style={{ color: "var(--muted)" }}
           >
-            CLAIM
+            OPN
           </span>
-        )}
+        </div>
       </div>
 
       <button
-        className="btn btn-primary w-full justify-center"
+        className="btn btn-brass w-full"
         disabled={row.myPending === 0n || isPending || isConfirming}
         onClick={claim}
       >
         {isConfirming
-          ? "Claiming…"
+          ? "Collecting…"
           : isPending
-            ? "Awaiting…"
+            ? "Awaiting wallet…"
             : isSuccess
-              ? "✓ Claimed"
-              : `Claim ${fmt(row.myPending, 4)}`}
+              ? "✓ Collected"
+              : `Collect ${fmt(row.myPending, 4)}`}
       </button>
     </div>
   );
@@ -405,26 +526,40 @@ function ArticleOwnCard({
 }) {
   const [local, setLocal] = useState<{ title: string } | null>(null);
   useEffect(() => {
-    setLocal(loadArticles()[row.id] ?? null);
+    const all = loadArticles();
+    setLocal(all[row.id] ?? null);
   }, [row.id]);
 
   return (
     <Link href={`/article/${row.id}`}>
-      <div className="surface p-5 hover:bg-walnut-warm cursor-pointer h-full transition">
+      <div
+        className="shelf-card shelf-card-hover p-5 h-full"
+        style={{ cursor: "pointer" }}
+      >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span className="stamp stamp-mute">№ {String(row.id).padStart(3, "0")}</span>
-            <span className="stamp stamp-mute">v{row.version}</span>
+            <span className="stamp stamp-muted">Folio {String(row.id).padStart(2, "0")}</span>
+            <span className="stamp stamp-muted">v{row.version}</span>
           </div>
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-paper-mute">
-            {new Date(Number(row.createdAt) * 1000).toLocaleDateString(undefined, {
-              month: "short",
-              day: "numeric",
-            })}
+          <span
+            className="font-mono text-[10px]"
+            style={{ color: "var(--muted)" }}
+          >
+            {new Date(Number(row.createdAt) * 1000).toLocaleDateString(
+              undefined,
+              { month: "short", day: "numeric" }
+            )}
           </span>
         </div>
-        <div className="font-display italic text-[20px] leading-snug mb-4 text-paper line-clamp-2">
-          {local?.title ?? "(off-chain title not in cache)"}
+        <div
+          className="font-display italic line-clamp-2 mb-4"
+          style={{
+            fontSize: "1.1rem",
+            color: "var(--parchment)",
+            lineHeight: 1.3,
+          }}
+        >
+          {local?.title ?? "(an untitled volume)"}
         </div>
 
         <div className="grid grid-cols-2 gap-2">
@@ -436,7 +571,7 @@ function ArticleOwnCard({
           <Metric
             label="Status"
             value={row.totalStaked > 0n ? "Live · Earning" : "Awaiting endow"}
-            accent={row.totalStaked > 0n ? "verdigris" : "mute"}
+            accent={row.totalStaked > 0n ? "verdigris" : "muted"}
           />
         </div>
       </div>
@@ -451,22 +586,29 @@ function Metric({
 }: {
   label: string;
   value: string;
-  accent?: "brass" | "indigo" | "verdigris" | "mute";
+  accent?: "brass" | "indigo" | "verdigris" | "muted";
 }) {
   const colors = {
-    brass: "text-brass-bright",
-    indigo: "text-ink-indigo-bright",
-    verdigris: "text-verdigris-bright",
-    mute: "text-paper-mute",
+    brass: "var(--brass-2)",
+    indigo: "var(--indigo-2)",
+    verdigris: "var(--verdigris-2)",
+    muted: "var(--muted)",
   };
   return (
-    <div className="bg-walnut-deep border border-rule rounded-sm p-2 text-center">
-      <div className={`font-mono text-[13px] font-medium ${colors[accent]}`}>
+    <div
+      className="p-2.5 rounded-sm text-center"
+      style={{
+        background: "rgba(0, 0, 0, 0.25)",
+        border: "1px solid var(--border)",
+      }}
+    >
+      <div
+        className="font-mono text-[13px]"
+        style={{ color: colors[accent] }}
+      >
         {value}
       </div>
-      <div className="text-[9px] font-mono uppercase tracking-[0.18em] text-paper-mute mt-0.5">
-        {label}
-      </div>
+      <div className="kicker mt-0.5 text-[8px]">{label}</div>
     </div>
   );
 }
